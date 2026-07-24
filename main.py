@@ -26,4 +26,6 @@ app.add_middleware(
     allow_headers=["*"] #Accept any request header — Authorization, Content-Type, custom headers, etc.
 )
 
-
+# Routers
+app.include_router(chat_router)
+app.include_router(health_router)
