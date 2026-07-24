@@ -26,3 +26,5 @@ logger.add(
     retention="7 days",
     compression="zip",
 )
+
+__all__ = ["logger"]
