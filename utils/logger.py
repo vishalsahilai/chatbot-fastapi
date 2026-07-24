@@ -16,3 +16,13 @@ logger.add(
     level="DEBUG",
     colorize=True,
 )
+
+# File handler — structured for production log parsing
+logger.add(
+    "logs/sadabahar.log",
+    format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {name}:{function}:{line} — {message}",
+    level="INFO",
+    rotation="10 MB",
+    retention="7 days",
+    compression="zip",
+)
