@@ -22,3 +22,7 @@ app_env: str = "development"
 app_host: str = "0.0.0.0"
 app_port: int = 8000
 debug: bool = True
+
+#Memory
+memory_backend: str = "both"      # "dict" | "redis"
+max_summaries: int = 5
