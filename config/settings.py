@@ -26,3 +26,9 @@ debug: bool = True
 #Memory
 memory_backend: str = "both"      # "dict" | "redis"
 max_summaries: int = 5
+
+# Redis 
+redis_host: str = "localhost"
+redis_port: int = 6379
+redis_db: int = 0
+redis_password: str = ""
