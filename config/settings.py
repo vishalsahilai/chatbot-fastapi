@@ -7,3 +7,9 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8", #Read the .env file using UTF-8 encoding/ UTF-8 supports all characters including special symbols, emojis, other languages
         case_sensitive=False,
     )
+
+#LLM
+google_api_key: str = "changeme"
+gemini_model: str = "gemini-2.5-flast"
+llm_temperature: float = 0.7
+llm_max_tokens: int = 512 #tokens ≈ roughly 350-400 words
