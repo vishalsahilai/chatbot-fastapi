@@ -38,3 +38,11 @@ async def global_exception_handler(request, exc):
         status_code=500,
         content={"detail": "An unexpected error occurred. Please try again."}
     )
+
+#startup / shutdown events
+#Exception is the Base Class of ALL errors in Python
+@app.on_event("startup")
+async def on_startup():
+    logger.info("Sadabahar Restaurant Chatbot API is starting up...")
+    logger.info(f"Environment: {settings.app_env}")
+
