@@ -24,3 +24,23 @@ def validate_message(message: str) -> str:
         )
  
     return message
+
+def validate_session_id(session_id: str) -> str:
+    """
+    Validates the session_id field.
+ 
+    Raises:
+        HTTPException 400 — if session_id is empty or malformed.
+ 
+    Returns:
+        Stripped session_id string.
+    """
+    if not session_id or not session_id.strip():
+        raise HTTPException(status_code=400, detail="session_id cannot be empty.")
+ 
+    session_id = session_id.strip()
+ 
+    if len(session_id) > 128:
+        raise HTTPException(status_code=400, detail="session_id is too long.")
+ 
+    return session_id
