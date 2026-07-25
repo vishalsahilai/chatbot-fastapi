@@ -34,3 +34,18 @@ _IN_MEMORY_STORE: dict ={}
 
 # Redis Client (lazy init)
 _redis_client = None
+
+def _get_redis():
+    """Lazily initialize and return the Redis client."""
+    global _redis_client
+    if _redis_client is None:
+        import redis
+        _redis_client = redis.Redis(
+            host=settings.redis_host, #Where Redis is running
+            port=settings.redis_port, #Which port Redis is on
+            db=settings.redis_db,     #Which Redis database
+            password=settings.redis_password or None, #Password if set
+            decode_responses=True,    #Return strings not bytes
+        )
+        logger.info(f"Redis connected: {settings.redis_host}:{settings.redis_port}")
+    return _redis_client
