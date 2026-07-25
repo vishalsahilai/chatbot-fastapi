@@ -28,3 +28,6 @@ from typing import Optional
 
 from config.settings import settings
 from utils.logger import logger
+
+# In-Memory Store (demo / single-process)
+_IN_MEMORY_STORE: dict ={}
