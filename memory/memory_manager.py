@@ -25,3 +25,6 @@ Session structure:
 
 import json
 from typing import Optional
+
+from config.settings import settings
+from utils.logger import logger
