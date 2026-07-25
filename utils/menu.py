@@ -1,5 +1,5 @@
 MENU: dict = {
-    "pizza":[
+    "pizza": [
         "Margherita",
         "Pepperoni",
     ],
@@ -23,18 +23,20 @@ MENU: dict = {
     ],
 }
 
-def get_manu_as_text() -> str:
+
+def get_menu_as_text() -> str:
     """
     Returns the menu formatted as a readable string
-    for injection into the system prompt.  
+    for injection into the system prompt.
     """
-    lines = ["SADABAHAR RESTAURANT MENU:", ""]
+    lines = ["📋 SADABAHAR RESTAURANT MENU:", ""]
     for category, items in MENU.items():
-        lines.append(f "{category.upper()}")
+        lines.append(f"  {category.upper()}:")
         for item in items:
-            lines.append(f"  -{item}")
+            lines.append(f"    - {item}")
         lines.append("")
     return "\n".join(lines)
+
 
 def get_all_item_names() -> list[str]:
     """
@@ -42,4 +44,3 @@ def get_all_item_names() -> list[str]:
     Used for validation — LLM must not recommend items outside this list.
     """
     return [item for items in MENU.values() for item in items]
- 
