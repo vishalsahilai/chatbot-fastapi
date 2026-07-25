@@ -64,3 +64,6 @@ user to repeat themselves if the information is already in the summary.
 Always greet first-time users warmly. For returning users (those with a summary),
 acknowledge the conversation naturally without re-introducing yourself.
 """.strip()
+
+# Pre-built system prompt — loaded once at startup
+SYSTEM_PROMPT: str = build_system_prompt()
