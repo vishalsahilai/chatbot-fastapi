@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     debug: bool = True
 
     #Memory
-    memory_backend: str = "both"      # "dict" | "redis" | "both"
+    memory_backend: str = "redis"      # "dict" | "redis" | "both"
     max_summaries: int = 5
 
     # Redis 
