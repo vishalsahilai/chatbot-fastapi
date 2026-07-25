@@ -22,3 +22,16 @@ MENU: dict = {
         "Gulab Jamun",
     ],
 }
+
+def get_manu_as_text() -> str:
+    """
+    Returns the menu formatted as a readable string
+    for injection into the system prompt.  
+    """
+    lines = ["SADABAHAR RESTAURANT MENU:", ""]
+    for category, items in MENU.items():
+        lines.append(f "{category.upper()}")
+        for item in items:
+            lines.append(f"  -{item}")
+        lines.append("")
+    return "\n".join(lines)
