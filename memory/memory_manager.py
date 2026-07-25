@@ -31,3 +31,6 @@ from utils.logger import logger
 
 # In-Memory Store (demo / single-process)
 _IN_MEMORY_STORE: dict ={}
+
+# Redis Client (lazy init)
+_redis_client = None
