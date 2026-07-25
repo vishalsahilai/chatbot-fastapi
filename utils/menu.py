@@ -35,3 +35,11 @@ def get_manu_as_text() -> str:
             lines.append(f"  -{item}")
         lines.append("")
     return "\n".join(lines)
+
+def get_all_item_names() -> list[str]:
+    """
+    Returns a flat list of all menu item names.
+    Used for validation — LLM must not recommend items outside this list.
+    """
+    return [item for items in MENU.values() for item in items]
+ 
