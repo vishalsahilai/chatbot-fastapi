@@ -23,3 +23,5 @@ Session structure:
 }
 """
 
+import json
+from typing import Optional
