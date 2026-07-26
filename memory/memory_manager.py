@@ -79,3 +79,13 @@ def _empty_session() -> dict:
         "last_messages": [],
         "message_count": 0,
     }
+
+# Public API
+def get_session(session_id: str) -> dict:
+    """
+    Retrieves a session by ID.
+    If session does not exist, returns a fresh empty session (auto-create).
+    """
+    session = _read_session(session_id)
+    logger.debug(f"[{session_id}] Session loaded — msg_count={session['message_count']}")
+    return session
