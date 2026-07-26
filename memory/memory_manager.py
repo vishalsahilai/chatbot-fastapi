@@ -99,3 +99,14 @@ def increment_message_count(session: dict) -> dict:
     """Increments the message counter in the session object."""
     session["message_count"] += 1
     return session
+
+def append_summary(session: dict, summary: dict) -> dict:
+    """
+    Appends a new summary to the session's summaries list.
+    Enforces a rolling window of MAX_SUMMARIES (default: 5).
+    Oldest summary is dropped when limit is exceeded.
+    """
+    session["summaries"].append(summary)
+    if len(session["summaries"]) > settings.max_summaries:
+        session["summaries"].pop(0)  # drop oldest
+    return session
