@@ -49,3 +49,14 @@ def _get_redis():
         )
         logger.info(f"Redis connected: {settings.redis_host}:{settings.redis_port}")
     return _redis_client
+
+# Internal: read / write session
+def _read_session(session_id: str) -> dict:
+    """Read session data from the configured backend."""
+    if settings.memory_backend == "redis":
+        raw = _get_redis().get(f"session:{session_id}")
+        if raw:
+            return json.loads(raw)
+        return _empty_session()
+    else:
+        return _IN_MEMORY_STORE.get(session_id, _empty_session())
