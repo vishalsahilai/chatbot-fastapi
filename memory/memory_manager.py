@@ -60,3 +60,14 @@ def _read_session(session_id: str) -> dict:
         return _empty_session()
     else:
         return _IN_MEMORY_STORE.get(session_id, _empty_session())
+
+def _write_session(session_id: str, data: dict) -> None:
+    """Write session data to the configured backend."""
+    if settings.memory_backend == "redis":
+        _get_redis().set(
+            f"session:{session_id}",
+            json.dumps(data),
+            ex=86400,  # TTL: 24 hours
+        )
+    else:
+        _IN_MEMORY_STORE[session_id] = data
