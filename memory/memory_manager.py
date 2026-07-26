@@ -71,3 +71,11 @@ def _write_session(session_id: str, data: dict) -> None:
         )
     else:
         _IN_MEMORY_STORE[session_id] = data
+
+def _empty_session() -> dict:
+    """Returns the default empty session structure."""
+    return {
+        "summaries": [],
+        "last_messages": [],
+        "message_count": 0,
+    }
