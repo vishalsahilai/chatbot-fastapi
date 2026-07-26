@@ -94,3 +94,8 @@ def save_session(session_id: str, session: dict) -> None:
     """Persists the session back to the store."""
     _write_session(session_id, session)
     logger.debug(f"[{session_id}] Session saved — msg_count={session['message_count']}")
+
+def increment_message_count(session: dict) -> dict:
+    """Increments the message counter in the session object."""
+    session["message_count"] += 1
+    return session
