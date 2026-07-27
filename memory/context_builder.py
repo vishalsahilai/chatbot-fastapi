@@ -22,4 +22,17 @@ def get_context_for_llm(session: dict, current_message: str) -> str:
         logger.debug("Context phase: 1 (first message — no prior context)")
         return current_message
 
-    
+
+    #Second message — send full previous exchange
+    if msg_count == 1 and last_messages:
+        logger.debug("Context phase: 2 (second message — full prior exchange)")
+        prev_user = last_messages[0]["content"] if len(last_messages) > 0 else ""
+        prev_bot = last_messages[1]["content"] if len(last_messages) > 1 else ""
+ 
+        context = (
+            "[Previous Conversation]\n"
+            f"User: {prev_user}\n"
+            f"Assistant: {prev_bot}\n\n"
+            f"[Current Message]\n{current_message}"
+        )
+        return context
