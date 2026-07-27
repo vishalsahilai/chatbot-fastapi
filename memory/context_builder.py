@@ -36,3 +36,12 @@ def get_context_for_llm(session: dict, current_message: str) -> str:
             f"[Current Message]\n{current_message}"
         )
         return context
+
+    #Third message and beyond — summaries only
+
+    logger.debug(f"Context phase: 3+ (msg #{msg_count + 1} — using {len(summaries)} summaries)")
+ 
+    if not summaries:
+        # Safety fallback: no summaries yet, just send current message
+        return current_message
+ 
