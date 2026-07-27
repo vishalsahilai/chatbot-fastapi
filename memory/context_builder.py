@@ -16,3 +16,10 @@ def get_context_for_llm(session: dict, current_message: str) -> str:
     msg_count = session.get("message_count", 0)
     summaries = session.get("summaries", [])
     last_messages = session.get("last_messages", [])
+
+    #First message — no prior context
+    if msg_count == 0:
+        logger.debug("Context phase: 1 (first message — no prior context)")
+        return current_message
+
+    
