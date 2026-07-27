@@ -66,3 +66,13 @@ Example format:
     try:
         raw = await llm_chain.ainvoke({"input": summarization_prompt})
         raw_text = raw.content if hasattr(raw, "content") else str(raw)
+
+                # Strip markdown fences if present
+        clean = raw_text.strip()
+        if clean.startswith("```"):
+            clean = clean.split("```")[1]
+            if clean.startswith("json"):
+                clean = clean[4:]
+        clean = clean.strip()
+ 
+        summary = json.loads(clean)
