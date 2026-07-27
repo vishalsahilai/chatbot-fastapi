@@ -7,12 +7,14 @@ Each summary captures:
   - bot_response : what the bot said (condensed)
   - context      : any important context for future turns
 """
+ 
 import json
 from tenacity import retry, stop_after_attempt, wait_exponential
-
+ 
 from config.settings import settings
 from utils.logger import logger
-
+ 
+ 
 @retry(
     stop=stop_after_attempt(3),
     wait=wait_exponential(multiplier=1, min=1, max=10),
@@ -22,7 +24,7 @@ async def summarize_conversation(
     bot_response: str,
     llm_chain,
 ) -> dict:
-        """
+    """
     Summarizes a single conversation turn into a structured dict.
  
     Args:
