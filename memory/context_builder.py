@@ -44,4 +44,18 @@ def get_context_for_llm(session: dict, current_message: str) -> str:
     if not summaries:
         # Safety fallback: no summaries yet, just send current message
         return current_message
+    
+    summary_lines = ["[Conversation Summary]"]
+    for i, s in enumerate(summaries, 1):
+        summary_lines.append(
+            f"\n[Exchange {i}]\n"
+            f"  User Intent  : {s.get('user_intent', '')}\n"
+            f"  Bot Response : {s.get('bot_response', '')}\n"
+            f"  Context      : {s.get('context', '')}"
+        )
+ 
+    summary_lines.append(f"\n[Current Message]\n{current_message}")
+ 
+    return "\n".join(summary_lines)
+ 
  
