@@ -110,3 +110,14 @@ def append_summary(session: dict, summary: dict) -> dict:
     if len(session["summaries"]) > settings.max_summaries:
         session["summaries"].pop(0)  # drop oldest
     return session
+
+def set_last_messages(session: dict, user_msg: str, bot_response: str) -> dict:
+    """
+    Stores the most recent user message and bot response.
+    This is used for phase-2 (full context) and for summarization input.
+    """
+    session["last_messages"] = [
+        {"role": "user", "content": user_msg},
+        {"role": "assistant", "content": bot_response},
+    ]
+    return session
