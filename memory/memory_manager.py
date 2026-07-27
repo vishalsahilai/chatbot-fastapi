@@ -121,3 +121,11 @@ def set_last_messages(session: dict, user_msg: str, bot_response: str) -> dict:
         {"role": "assistant", "content": bot_response},
     ]
     return session
+
+def delete_session(session_id: str) -> None:
+    """Deletes a session (useful for testing or explicit logout)."""
+    if settings.memory_backend == "redis":
+        _get_redis().delete(f"session:{session_id}")
+    else:
+        _IN_MEMORY_STORE.pop(session_id, None)
+    logger.info(f"[{session_id}] Session deleted.")
