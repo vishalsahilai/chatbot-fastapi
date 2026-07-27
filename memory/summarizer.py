@@ -39,3 +39,28 @@ async def summarize_conversation(
  
     Falls back to a basic summary if LLM call or JSON parsing fails.
     """
+    summarization_prompt = f"""
+You are a conversation summarizer for a restaurant chatbot system.
+ 
+Summarize the following exchange in strict JSON format with exactly these three keys:
+- "user_intent"  : A brief description of what the user wanted or asked (1 sentence).
+- "bot_response" : A brief summary of what the bot replied (1-2 sentences).
+- "context"      : Any useful context that should be remembered for future turns
+                   (e.g., user preferences, items they liked, delivery area, etc.).
+ 
+Exchange to summarize:
+USER: {user_message}
+BOT: {bot_response}
+ 
+Respond ONLY with valid JSON. No preamble, no markdown, no explanation.
+Example format:
+{{
+  "user_intent": "User asked about available pizzas.",
+  "bot_response": "Bot listed Margherita and Pepperoni as available options.",
+  "context": "User is interested in pizza. May want to place an order."
+}}
+""".strip()
+ 
+    try:
+        raw = await llm_chain.ainvoke({"input": summarization_prompt})
+        raw_text = raw.content if hasattr(raw, "content") else str(raw)
