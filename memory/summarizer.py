@@ -9,3 +9,6 @@ Each summary captures:
 """
 import json
 from tenacity import retry, stop_after_attempt, wait_exponential
+
+from config.settings import settings
+from utils.logger import logger
