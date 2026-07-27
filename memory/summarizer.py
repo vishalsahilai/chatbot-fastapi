@@ -17,3 +17,25 @@ from utils.logger import logger
     stop=stop_after_attempt(3),
     wait=wait_exponential(multiplier=1, min=1, max=10),
 )
+async def summarize_conversation(
+    user_message: str,
+    bot_response: str,
+    llm_chain,
+) -> dict:
+        """
+    Summarizes a single conversation turn into a structured dict.
+ 
+    Args:
+        user_message : The user's message in this turn.
+        bot_response : The bot's response in this turn.
+        llm_chain    : The LangChain LLM chain instance.
+ 
+    Returns:
+        {
+            "user_intent": str,
+            "bot_response": str,
+            "context": str
+        }
+ 
+    Falls back to a basic summary if LLM call or JSON parsing fails.
+    """
