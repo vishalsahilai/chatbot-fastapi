@@ -38,3 +38,19 @@ def test_chat_message_too_long_returns_400():
 def test_chat_missing_fields_returns_422():
     response = client.post("/chat", json={"message": "Hello"})
     assert response.status_code == 422
+
+# Chat Endpoint — Successful Response
+@patch("services.chat_service.safe_invoke_llm", new_callable=AsyncMock)
+def test_chat_returns_valid_response(mock_llm):
+    mock_llm.return_value = "We have Margherita and Pepperoni pizzas!"
+ 
+    response = client.post("/chat", json={
+        "session_id": "integration_test_1",
+        "message": "What pizzas do you have?"
+    })
+ 
+    assert response.status_code == 200
+    data = response.json()
+    assert data["session_id"] == "integration_test_1"
+    assert data["response"] == "We have Margherita and Pepperoni pizzas!"
+    assert data["message_count"] == 1
