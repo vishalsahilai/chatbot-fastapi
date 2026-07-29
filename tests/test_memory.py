@@ -47,4 +47,17 @@ def test_append_summary_within_limit():
             "context": f"context {i}",
         })
     assert len(session["summaries"]) == 3
+
+def test_append_summary_enforces_max_5():
+    session = _empty_session()
+    for i in range(7):
+        session = append_summary(session, {
+            "user_intent": f"intent {i}",
+            "bot_response": f"response {i}",
+            "context": f"context {i}",
+        })
+    assert len(session["summaries"]) == 5
+    # Oldest should be dropped — first summary should now be index 2
+    assert session["summaries"][0]["user_intent"] == "intent 2"
+ 
  
