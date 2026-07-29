@@ -20,3 +20,16 @@ class HealthResponse(BaseModel):
     summary="Health check",
     tags=["System"],
 )
+async def health() -> HealthResponse:
+    """
+    Returns the current health status of the chatbot service.
+    Use this endpoint for uptime monitoring and deployment checks.
+    """
+    return HealthResponse(
+        status="healthy",
+        service="Sadabahar Restaurant Chatbot",
+        version="1.0.0",
+        environment=settings.app_env,
+        memory_backend=settings.memory_backend,
+        timestamp=datetime.now(timezone.utc).isoformat(),
+    )
