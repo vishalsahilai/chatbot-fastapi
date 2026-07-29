@@ -21,3 +21,7 @@ _summarizer_llm = ChatGoogleGenerativeAI(
     max_output_tokens=300,
     google_api_key=settings.google_api_key,
 )
+
+def get_llm() -> ChatGoogleGenerativeAI:
+    """Returns the main chat LLM instance."""
+    return _llm
