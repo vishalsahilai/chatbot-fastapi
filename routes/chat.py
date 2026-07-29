@@ -6,3 +6,18 @@ from utils.validators import validate_message, validate_session_id
 from utils.logger import logger
  
 router = APIRouter()
+
+# Request 
+class ChatRequest(BaseModel):
+    session_id: str
+    message: str
+ 
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "session_id": "user_abc123",
+                "message": "What pizzas do you have?",
+            }
+        }
+    }
+ 
