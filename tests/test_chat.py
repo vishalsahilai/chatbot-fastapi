@@ -28,4 +28,9 @@ def test_chat_whitespace_message_returns_400():
 def test_chat_empty_session_id_returns_400():
     response = client.post("/chat", json={"session_id": "", "message": "Hello"})
     assert response.status_code == 400
- 
+
+def test_chat_message_too_long_returns_400():
+    long_msg = "a" * 2001
+    response = client.post("/chat", json={"session_id": "test1", "message": long_msg})
+    assert response.status_code == 400
+    assert "too long" in response.json()["detail"].lower() 
