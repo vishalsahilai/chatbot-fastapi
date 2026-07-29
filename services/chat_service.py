@@ -30,3 +30,8 @@ async def process_chat(session_id: str, user_message: str) -> dict:
     Raises:
         HTTPException 503 if LLM is unavailable.
     """
+
+    # Load session  
+    session = get_session(session_id)
+    msg_count = session["message_count"]
+    logger.info(f"[{session_id}] Processing message #{msg_count + 1}: '{user_message[:60]}...'")
