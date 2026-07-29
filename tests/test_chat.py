@@ -14,4 +14,5 @@ def test_health_returns_200():
     assert data["status"] == "healthy"
     assert data["service"] == "Sadabahar Restaurant Chatbot"
     assert "timestamp" in data
- 
+
+# Chat Endpoint — Input Validation
