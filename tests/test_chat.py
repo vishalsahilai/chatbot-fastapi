@@ -78,4 +78,16 @@ def test_chat_llm_failure_returns_503(mock_llm):
  
     assert response.status_code == 503
     assert "unavailable" in response.json()["detail"].lower()
+
+# Session Isolation Test
+@patch("services.chat_service.safe_invoke_llm", new_callable=AsyncMock)
+def test_sessions_are_isolated(mock_llm):
+    mock_llm.return_value = "Reply"
+ 
+    client.post("/chat", json={"session_id": "session_A", "message": "Hi"})
+    client.post("/chat", json={"session_id": "session_A", "message": "Again"})
+ 
+    # Session B should start fresh
+    response = client.post("/chat", json={"session_id": "session_B", "message": "First"})
+    assert response.json()["message_count"] == 1
  
