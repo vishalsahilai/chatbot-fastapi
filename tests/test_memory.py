@@ -68,5 +68,13 @@ def test_set_last_messages():
     assert session["last_messages"][0]["content"] == "hello"
     assert session["last_messages"][1]["role"] == "assistant"
     assert session["last_messages"][1]["content"] == "hi there!"
- 
+
+# Context Phase Tests
+def test_phase_1_returns_message_only():
+    session = _empty_session()
+    context = get_context_for_llm(session, "What burgers do you have?")
+    assert context == "What burgers do you have?"
+    assert "[Previous Conversation]" not in context
+    assert "[Conversation Summary]" not in context
+
  
