@@ -87,6 +87,25 @@ def test_phase_2_includes_previous_exchange():
     assert "Hello" in context
     assert "Hi! Welcome to Sadabahar!" in context
     assert "What pizzas do you have?" in context
+
+def test_phase_3_uses_summaries():
+    session = _empty_session()
+    session["message_count"] = 3
+    session = append_summary(session, {
+        "user_intent": "User asked about pizzas",
+        "bot_response": "Recommended Margherita and Pepperoni",
+        "context": "User likes pizza",
+    })
+    session = append_summary(session, {
+        "user_intent": "User asked about delivery",
+        "bot_response": "Delivery within 10 km",
+        "context": "User is within delivery range",
+    })
  
+    context = get_context_for_llm(session, "Can I order a Margherita?")
+    assert "[Conversation Summary]" in context
+    assert "User asked about pizzas" in context
+    assert "Can I order a Margherita?" in context
+    assert "[Previous Conversation]" not in context
 
  
