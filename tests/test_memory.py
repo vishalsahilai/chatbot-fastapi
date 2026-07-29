@@ -36,5 +36,15 @@ def test_delete_session():
  
     fresh = get_session(sid)
     assert fresh["message_count"] == 0
- 
+
+# Summary Rolling Window Tests
+def test_append_summary_within_limit():
+    session = _empty_session()
+    for i in range(3):
+        session = append_summary(session, {
+            "user_intent": f"intent {i}",
+            "bot_response": f"response {i}",
+            "context": f"context {i}",
+        })
+    assert len(session["summaries"]) == 3
  
