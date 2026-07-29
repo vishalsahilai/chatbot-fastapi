@@ -59,5 +59,14 @@ def test_append_summary_enforces_max_5():
     assert len(session["summaries"]) == 5
     # Oldest should be dropped — first summary should now be index 2
     assert session["summaries"][0]["user_intent"] == "intent 2"
+
+ 
+def test_set_last_messages():
+    session = _empty_session()
+    session = set_last_messages(session, "hello", "hi there!")
+    assert session["last_messages"][0]["role"] == "user"
+    assert session["last_messages"][0]["content"] == "hello"
+    assert session["last_messages"][1]["role"] == "assistant"
+    assert session["last_messages"][1]["content"] == "hi there!"
  
  
