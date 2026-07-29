@@ -7,7 +7,7 @@ from utils.logger import logger
  
 router = APIRouter()
 
-# Request 
+# Request Models
 class ChatRequest(BaseModel):
     session_id: str
     message: str
@@ -20,4 +20,6 @@ class ChatRequest(BaseModel):
             }
         }
     }
- 
+
+
+# Response Models
