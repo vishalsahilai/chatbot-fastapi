@@ -77,4 +77,16 @@ def test_phase_1_returns_message_only():
     assert "[Previous Conversation]" not in context
     assert "[Conversation Summary]" not in context
 
+def test_phase_2_includes_previous_exchange():
+    session = _empty_session()
+    session["message_count"] = 1
+    session = set_last_messages(session, "Hello", "Hi! Welcome to Sadabahar!")
+ 
+    context = get_context_for_llm(session, "What pizzas do you have?")
+    assert "[Previous Conversation]" in context
+    assert "Hello" in context
+    assert "Hi! Welcome to Sadabahar!" in context
+    assert "What pizzas do you have?" in context
+ 
+
  
