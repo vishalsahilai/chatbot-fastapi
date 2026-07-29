@@ -54,3 +54,15 @@ def test_chat_returns_valid_response(mock_llm):
     assert data["session_id"] == "integration_test_1"
     assert data["response"] == "We have Margherita and Pepperoni pizzas!"
     assert data["message_count"] == 1
+
+ 
+@patch("services.chat_service.safe_invoke_llm", new_callable=AsyncMock)
+def test_chat_increments_message_count(mock_llm):
+    mock_llm.return_value = "Bot reply"
+    sid = "count_test_session"
+ 
+    for i in range(3):
+        response = client.post("/chat", json={"session_id": sid, "message": f"Message {i}"})
+        assert response.status_code == 200
+        assert response.json()["message_count"] == i + 1
+ 
