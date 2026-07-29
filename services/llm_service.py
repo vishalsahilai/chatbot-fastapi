@@ -25,3 +25,7 @@ _summarizer_llm = ChatGoogleGenerativeAI(
 def get_llm() -> ChatGoogleGenerativeAI:
     """Returns the main chat LLM instance."""
     return _llm
+
+def get_summarizer_llm() -> ChatGoogleGenerativeAI:
+    """Returns the summarizer LLM instance (lower temperature)."""
+    return _summarizer_llm
