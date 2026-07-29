@@ -27,4 +27,19 @@ class ChatResponse(BaseModel):
     session_id: str
     response: str
     message_count: int
+
+# Endpoint
+@router.post(
+    "/chat",
+    response_model=ChatResponse,
+    summary="Send a message to the restaurant chatbot",
+    tags=["Chat"],
+)
+async def chat(request: ChatRequest) -> ChatResponse:
+    """
+    Send a message and receive an AI response from Sada,
+    the Sadabahar Restaurant chatbot.
  
+    - **session_id**: Unique identifier for the user's session.
+    - **message**: The user's message (max 2000 characters).
+    """
