@@ -60,3 +60,22 @@ async def invoke_llm(user_context: str) -> str:
 
         logger.debug(f"Gemini response ({len(reply)} chars): {reply[:100]}...")
         return reply
+
+    except Exception as e:
+        logger.error(f"Gemini invocation failed: {e}")
+        raise
+
+
+async def safe_invoke_llm(user_context: str) -> str:
+    """
+    Wrapper around invoke_llm with top-level error handling.
+    Raises HTTPException-friendly errors if all retries fail.
+    """
+    try:
+        return await invoke_llm(user_context)
+    except RetryError:
+        logger.error("Gemini failed after all retry attempts.")
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected Gemini error: {e}")
+        raise
