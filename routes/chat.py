@@ -23,3 +23,8 @@ class ChatRequest(BaseModel):
 
 
 # Response Models
+class ChatResponse(BaseModel):
+    session_id: str
+    response: str
+    message_count: int
+ 
