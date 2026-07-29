@@ -16,3 +16,15 @@ def test_get_session_creates_empty_session():
     assert session["summaries"] == []
     assert session["last_messages"] == []
     assert session["message_count"] == 0
+
+ 
+def test_save_and_retrieve_session():
+    sid = "test_save_retrieve"
+    session = _empty_session()
+    session["message_count"] = 5
+    save_session(sid, session)
+ 
+    loaded = get_session(sid)
+    assert loaded["message_count"] == 5
+    delete_session(sid)
+ 
