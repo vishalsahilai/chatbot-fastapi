@@ -27,4 +27,14 @@ def test_save_and_retrieve_session():
     loaded = get_session(sid)
     assert loaded["message_count"] == 5
     delete_session(sid)
+
+def test_delete_session():
+    sid = "test_delete"
+    session = _empty_session()
+    save_session(sid, session)
+    delete_session(sid)
+ 
+    fresh = get_session(sid)
+    assert fresh["message_count"] == 0
+ 
  
