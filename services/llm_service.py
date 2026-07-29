@@ -6,6 +6,8 @@ from config.settings import settings
 from prompts.system_prompt import SYSTEM_PROMPT
 from utils.logger import logger
 
+
+
 # LLM Instance (shared, thread-safe)
 _llm = ChatGoogleGenerativeAI(
     model=settings.gemini_model,
@@ -56,7 +58,14 @@ async def invoke_llm(user_context: str) -> str:
         ]
 
         response = await _llm.ainvoke(messages)
-        reply = response.content.strip()
+        # Gemini can return content as a list or a string
+        if isinstance(response.content, list):
+            reply = " ".join(
+                block.get("text", "") if isinstance(block, dict) else str(block)
+                for block in response.content
+            ).strip()
+        else:
+            reply = response.content.strip()
 
         logger.debug(f"Gemini response ({len(reply)} chars): {reply[:100]}...")
         return reply
