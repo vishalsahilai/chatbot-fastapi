@@ -16,3 +16,7 @@ def test_health_returns_200():
     assert "timestamp" in data
 
 # Chat Endpoint — Input Validation
+def test_chat_empty_message_returns_400():
+    response = client.post("/chat", json={"session_id": "test1", "message": ""})
+    assert response.status_code == 400
+    assert "empty" in response.json()["detail"].lower()
