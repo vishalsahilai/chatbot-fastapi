@@ -13,3 +13,10 @@ class HealthResponse(BaseModel):
     environment: str
     memory_backend: str
     timestamp: str
+
+@router.get(
+    "/health",
+    response_model=HealthResponse,
+    summary="Health check",
+    tags=["System"],
+)
