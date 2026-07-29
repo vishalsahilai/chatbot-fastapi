@@ -20,3 +20,7 @@ def test_chat_empty_message_returns_400():
     response = client.post("/chat", json={"session_id": "test1", "message": ""})
     assert response.status_code == 400
     assert "empty" in response.json()["detail"].lower()
+
+def test_chat_whitespace_message_returns_400():
+    response = client.post("/chat", json={"session_id": "test1", "message": "   "})
+    assert response.status_code == 400
