@@ -39,3 +39,13 @@ async def process_chat(session_id: str, user_message: str) -> dict:
     # Build context
     context = get_context_for_llm(session, user_message)
     logger.debug(f"[{session_id}] Context built ({len(context)} chars)")
+
+    # Invoke LLM
+    try:
+        bot_response = await safe_invoke_llm(context)
+    except Exception as e:
+        logger.error(f"[{session_id}] LLM failure: {e}")
+        raise HTTPException(
+            status_code=503,
+            detail="LLM service is temporarily unavailable. Please try again in a moment.",
+        )
