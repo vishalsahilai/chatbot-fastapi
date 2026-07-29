@@ -49,3 +49,25 @@ async def process_chat(session_id: str, user_message: str) -> dict:
             status_code=503,
             detail="LLM service is temporarily unavailable. Please try again in a moment.",
         )
+
+    # Update memory
+    session = increment_message_count(session)
+ 
+    # For message 3+, generate and store a summary of the PREVIOUS exchange.
+    # (We summarize the just-completed turn and store it.)
+    if session["message_count"] >= 2:
+        try:
+            summary = await summarize_conversation(
+                user_message=user_message,
+                bot_response=bot_response,
+                llm_chain=get_summarizer_llm(),
+            )
+            session = append_summary(session, summary)
+            logger.debug(f"[{session_id}] Summary appended. Total summaries: {len(session['summaries'])}")
+        except Exception as e:
+            # Non-fatal: log and continue without summary
+            logger.warning(f"[{session_id}] Summarization skipped: {e}")
+ 
+    # Always update last_messages for context
+    session = set_last_messages(session, user_message, bot_response)
+ 
