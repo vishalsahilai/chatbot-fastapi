@@ -49,3 +49,8 @@ async def chat(request: ChatRequest) -> ChatResponse:
     message = validate_message(request.message)
  
     logger.info(f"POST /chat — session={session_id}")
+
+    # Delegate to chat service
+    result = await process_chat(session_id=session_id, user_message=message)
+ 
+    return ChatResponse(**result)
