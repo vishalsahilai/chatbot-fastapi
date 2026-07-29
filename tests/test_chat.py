@@ -24,3 +24,8 @@ def test_chat_empty_message_returns_400():
 def test_chat_whitespace_message_returns_400():
     response = client.post("/chat", json={"session_id": "test1", "message": "   "})
     assert response.status_code == 400
+
+def test_chat_empty_session_id_returns_400():
+    response = client.post("/chat", json={"session_id": "", "message": "Hello"})
+    assert response.status_code == 400
+ 
