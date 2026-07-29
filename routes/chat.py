@@ -43,3 +43,9 @@ async def chat(request: ChatRequest) -> ChatResponse:
     - **session_id**: Unique identifier for the user's session.
     - **message**: The user's message (max 2000 characters).
     """
+
+    # Validate inputs
+    session_id = validate_session_id(request.session_id)
+    message = validate_message(request.message)
+ 
+    logger.info(f"POST /chat — session={session_id}")
