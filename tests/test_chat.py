@@ -65,4 +65,17 @@ def test_chat_increments_message_count(mock_llm):
         response = client.post("/chat", json={"session_id": sid, "message": f"Message {i}"})
         assert response.status_code == 200
         assert response.json()["message_count"] == i + 1
+
+# Chat Endpoint — LLM Failure Handling
+@patch("services.chat_service.safe_invoke_llm", new_callable=AsyncMock)
+def test_chat_llm_failure_returns_503(mock_llm):
+    mock_llm.side_effect = Exception("LLM connection failed")
+ 
+    response = client.post("/chat", json={
+        "session_id": "llm_fail_test",
+        "message": "Hello"
+    })
+ 
+    assert response.status_code == 503
+    assert "unavailable" in response.json()["detail"].lower()
  
