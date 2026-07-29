@@ -13,3 +13,11 @@ _llm = ChatGoogleGenerativeAI(
     max_output_tokens=settings.llm_max_tokens,
     google_api_key=settings.google_api_key,
 )
+
+# Summarizer LLM (lower temp for consistency)
+_summarizer_llm = ChatGoogleGenerativeAI(
+    model=settings.gemini_model,
+    temperature=0.1,
+    max_output_tokens=300,
+    google_api_key=settings.google_api_key,
+)
