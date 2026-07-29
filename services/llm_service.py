@@ -29,3 +29,34 @@ def get_llm() -> ChatGoogleGenerativeAI:
 def get_summarizer_llm() -> ChatGoogleGenerativeAI:
     """Returns the summarizer LLM instance (lower temperature)."""
     return _summarizer_llm
+
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=1, max=10),
+)
+async def invoke_llm(user_context: str) -> str:
+    """
+    Sends a message to the LLM with the system prompt.
+
+    Args:
+        user_context : The assembled context string from context_builder.
+                       This may include summaries + current user message,
+                       or just the raw message depending on the phase.
+
+    Returns:
+        The LLM's text response as a string.
+
+    Raises:
+        RuntimeError if all retry attempts fail.
+    """
+    try:
+        messages = [
+            SystemMessage(content=SYSTEM_PROMPT),
+            HumanMessage(content=user_context),
+        ]
+
+        response = await _llm.ainvoke(messages)
+        reply = response.content.strip()
+
+        logger.debug(f"Gemini response ({len(reply)} chars): {reply[:100]}...")
+        return reply
