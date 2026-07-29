@@ -70,4 +70,15 @@ async def process_chat(session_id: str, user_message: str) -> dict:
  
     # Always update last_messages for context
     session = set_last_messages(session, user_message, bot_response)
+
+    # Persist session
+    save_session(session_id, session)
+ 
+    logger.info(f"[{session_id}] Response sent ({len(bot_response)} chars)")
+ 
+    return {
+        "session_id": session_id,
+        "response": bot_response,
+        "message_count": session["message_count"],
+    }
  
