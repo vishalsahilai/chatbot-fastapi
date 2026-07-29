@@ -21,9 +21,9 @@ httpx                   # Async HTTP client (used internally by FastAPI TestClie
 
 langchain                 # Core LangChain framework
 langchain-core          # LangChain primitives (prompts, runnables, messages)
-langchain-openai        # OpenAI integration for LangChain
+langchain-google-genai        # Gemini integration for LangChain
 langchain-community       # Community integrations (loaders, memory, etc.)
-openai                   # Official OpenAI Python SDK
+genai                   # Official Gemini Python SDK
 
 # 4. Memory & Storage
 
@@ -60,3 +60,5 @@ pytest-cov                # Code coverage reports
 black                   # Code formatter
 isort                    # Import sorter
 flake8                  # Linter
+
+
