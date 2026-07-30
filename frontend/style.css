@@ -36,9 +36,16 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-::-webkit-scrollbar { width: 4px; }
+/* Global scrollbar */
+::-webkit-scrollbar       { width: 4px; }
 ::-webkit-scrollbar-track { background: var(--black-2); }
 ::-webkit-scrollbar-thumb { background: var(--red-dim); border-radius: 4px; }
+
+/* Chat window gets its own refined scrollbar */
+.chat-window::-webkit-scrollbar       { width: 3px; }
+.chat-window::-webkit-scrollbar-track { background: transparent; }
+.chat-window::-webkit-scrollbar-thumb { background: var(--black-4); border-radius: 4px; }
+.chat-window:hover::-webkit-scrollbar-thumb { background: var(--red-dim); }
 
 .header {
   position: fixed;
@@ -94,7 +101,7 @@ html, body {
 .brand-sub {
   font-size: 11px;
   color: var(--gray-2);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -141,6 +148,7 @@ html, body {
   flex-direction: column;
   gap: 16px;
   scroll-behavior: smooth;
+  overscroll-behavior: contain;
 }
 
 .msg-row {
@@ -272,6 +280,11 @@ html, body {
   color: var(--white);
 }
 
+.suggestion-btn:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+
 .input-bar {
   display: flex;
   align-items: flex-end;
@@ -318,12 +331,13 @@ html, body {
   transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
 }
 
-.send-btn:hover {
-  background: var(--red-bright);
-  box-shadow: 0 0 12px var(--red-glow);
-}
+.send-btn:hover    { background: var(--red-bright); box-shadow: 0 0 12px var(--red-glow); }
+.send-btn:active   { transform: scale(0.93); }
 
-.send-btn:active  { transform: scale(0.93); }
+.send-btn:focus-visible {
+  outline: 2px solid var(--white);
+  outline-offset: 2px;
+}
 
 .send-btn:disabled {
   background: var(--gray-3);
@@ -345,14 +359,22 @@ html, body {
   color: #FF6B6B;
 }
 
+/* Safe area for mobile notch / home bar */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .chat-wrap {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
 @media (max-width: 600px) {
-  .header-inner { padding: 12px 16px; }
-  .brand-name   { font-size: 16px; }
-  .status-pill  { display: none; }
-  .bubble       { max-width: 82%; }
-  .chat-wrap    { padding-top: 80px; }
-  .suggestions  { gap: 6px; }
+  .header-inner   { padding: 12px 16px; }
+  .brand-name     { font-size: 16px; }
+  .status-pill    { display: none; }
+  .bubble         { max-width: 82%; }
+  .chat-wrap      { padding-top: 80px; }
+  .suggestions    { gap: 6px; }
   .suggestion-btn { font-size: 11.5px; padding: 6px 11px; }
+  .input-hint     { padding-bottom: 16px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

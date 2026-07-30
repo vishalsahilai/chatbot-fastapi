@@ -1,5 +1,7 @@
 const API_BASE = "http://127.0.0.1:8000";
 
+let isLoading = false;
+
 function getSessionId() {
   let sid = localStorage.getItem("sadabahar_session_id");
   if (!sid) {
@@ -32,6 +34,7 @@ messageInput.addEventListener("keydown", (e) => {
 });
 
 async function sendMessage() {
+  if (isLoading) return;
   const text = messageInput.value.trim();
   if (!text) return;
 
@@ -128,13 +131,15 @@ function showTyping(show) {
 }
 
 function setLoading(loading) {
+  isLoading = loading;
   sendBtn.disabled = loading;
   messageInput.disabled = loading;
 }
 
 function scrollToBottom() {
   setTimeout(() => {
-    chatWindow.scrollTop = chatWindow.scrollHeight;
+    const last = chatWindow.lastElementChild;
+    if (last) last.scrollIntoView({ behavior: "smooth", block: "end" });
   }, 50);
 }
 
