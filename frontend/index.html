@@ -50,6 +50,29 @@
         <span></span><span></span><span></span>
       </div>
     </div>
+
+    <div class="suggestions" id="suggestions">
+      <button class="suggestion-btn" onclick="sendSuggestion(this)">🍕 View Pizzas</button>
+      <button class="suggestion-btn" onclick="sendSuggestion(this)">🍔 View Burgers</button>
+      <button class="suggestion-btn" onclick="sendSuggestion(this)">🚚 Delivery Info</button>
+      <button class="suggestion-btn" onclick="sendSuggestion(this)">🕐 Opening Hours</button>
+    </div>
+
+    <div class="input-bar">
+      <textarea
+        id="messageInput"
+        class="msg-input"
+        placeholder="Ask about our menu, delivery, specials…"
+        rows="1"
+        maxlength="2000"
+      ></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()" aria-label="Send message">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M2 10L18 2L10 18L9 11L2 10Z" fill="white" stroke="white" stroke-width="1" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+    <p class="input-hint">Delivery within 10 km · Powered by Gemini AI</p>
   </main>
 
   <script src="app.js"></script>
