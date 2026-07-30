@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: portfolio-chatbot
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GOOGLE_API_KEY_1
+        sync: false
+      - key: GOOGLE_API_KEY_2
+        sync: false
+      - key: GOOGLE_API_KEY_3
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: MEMORY_BACKEND
+        value: dict
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: false
+      - key: CORS_ORIGINS
+        value: '["https://sadabahar-restaurant-bot.vercel.app"]'
