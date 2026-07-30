@@ -164,6 +164,27 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-window.addEventListener("load", () => {
-  messageInput.focus();
-});
+const historySkeleton = document.getElementById("historySkeleton");
+const welcomeRow      = document.getElementById("welcomeRow");
+
+async function loadHistory() {
+  try {
+    const response = await fetch(`${API_BASE}/history/${SESSION_ID}`);
+    if (!response.ok) throw new Error("no history");
+
+    const data = await response.json();
+    const past = data.messages || [];
+
+    historySkeleton.remove();
+
+    if (past.length === 0) return;
+
+    welcomeRow.remove();
+    suggestions.style.display = "none";
+
+    past.forEach((m) => appendMessage(m.role === "assistant" ? "bot" : "user", m.content));
+
+  } catch (error) {
+    historySkeleton.remove();
+  }
+}

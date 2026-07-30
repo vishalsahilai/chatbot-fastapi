@@ -34,7 +34,11 @@
 
   <main class="chat-wrap">
     <div class="chat-window" id="chatWindow">
-      <div class="msg-row bot-row">
+      <div class="skeleton-row" id="historySkeleton">
+        <div class="avatar skeleton-avatar"></div>
+        <div class="skeleton-bubble"></div>
+      </div>
+      <div class="msg-row bot-row" id="welcomeRow">
         <div class="avatar">S</div>
         <div class="bubble bot-bubble">
           <p>Assalamu Alaikum! 👋 I'm <strong>Sada</strong>, your personal food guide at Sadabahar Restaurant.</p>
@@ -72,7 +76,7 @@
         </svg>
       </button>
     </div>
-    <p class="input-hint">Delivery within 10 km · Powered by Vishal Sahil</p>
+    <p class="input-hint">Delivery within 10 km · Powered by Gemini AI</p>
   </main>
 
   <script src="app.js"></script>
