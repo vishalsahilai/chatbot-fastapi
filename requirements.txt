@@ -1,64 +1,44 @@
-
 # Sadabahar Restaurant Chatbot — Python Dependencies
 # Python 3.10+
 # Install: pip install -r requirements.txt
 
-
 # 1. Web Framework
-
-fastapi[standard]              # Core API framework
-uvicorn[standard]        # ASGI server (with websocket + reload support)
-gunicorn                # Production WSGI/ASGI process manager
+fastapi[standard]
+uvicorn[standard]
+gunicorn
 
 # 2. Request / Response Handling
-
-pydantic                 # Data validation & settings management
-pydantic-settings         # .env file loader via BaseSettings
-python-multipart          # Form data parsing (required by FastAPI)
-httpx                   # Async HTTP client (used internally by FastAPI TestClient)
+pydantic
+pydantic-settings
+python-multipart
+httpx
 
 # 3. LangChain — LLM Framework
-
-langchain                 # Core LangChain framework
-langchain-core          # LangChain primitives (prompts, runnables, messages)
-langchain-google-genai        # Gemini integration for LangChain
-langchain-community       # Community integrations (loaders, memory, etc.)
-genai                   # Official Gemini Python SDK
+langchain
+langchain-core
+langchain-google-genai
+langchain-community
+google-generativeai
 
 # 4. Memory & Storage
-
-redis                     # Redis client (for production memory backend)
-# Note: In-memory dict is used by default (no extra dependency needed)
-# Switch to Redis by setting MEMORY_BACKEND=redis in .env
+redis
 
 # 5. Environment & Configuration
-
-python-dotenv              # Loads .env into os.environ
+python-dotenv
 
 # 6. Logging & Monitoring
-
-loguru                    # Structured, human-readable logging
+loguru
 
 # 7. Utilities
+tenacity
+python-dateutil
 
-uuid                       # UUID generation for session IDs (stdlib wrapper)
-tenacity                # Retry logic for LLM calls (exponential backoff)
-python-dateutil           # Date/time utilities
+# 8. Testing
+pytest
+pytest-asyncio
+pytest-cov
 
-# 8. CORS (handled by FastAPI middleware)
-
-# No extra package needed — FastAPI includes CORSMiddleware via Starlette
-
-# 9. Testing
-
-pytest                    # Test runner
-pytest-asyncio          # Async test support
-httpx                   # AsyncClient for FastAPI endpoint testing
-pytest-cov                # Code coverage reports
-
-# 10. Dev / Code Quality 
-black                   # Code formatter
-isort                    # Import sorter
-flake8                  # Linter
-
-
+# 9. Dev / Code Quality
+black
+isort
+flake8
