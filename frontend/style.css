@@ -409,3 +409,64 @@ html, body {
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.new-chat-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--black-3);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--gray-1);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.new-chat-btn:hover {
+  background: var(--red-subtle);
+  border-color: var(--red);
+  color: var(--white);
+}
+
+.new-chat-btn:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+
+.input-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 4px 0;
+}
+
+.char-counter {
+  font-size: 10.5px;
+  color: var(--gray-3);
+  letter-spacing: 0.02em;
+  padding-left: 4px;
+}
+
+.char-counter.near-limit {
+  color: var(--red-bright);
+}
+
+.input-hint {
+  flex: 1;
+  padding: 8px 0 12px;
+}
+
+@media (max-width: 600px) {
+  .new-chat-btn span { display: none; }
+  .new-chat-btn { padding: 7px 9px; }
+}

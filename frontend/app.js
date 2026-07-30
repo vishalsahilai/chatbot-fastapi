@@ -188,3 +188,25 @@ async function loadHistory() {
     historySkeleton.remove();
   }
 }
+const newChatBtn  = document.getElementById("newChatBtn");
+const charCounter = document.getElementById("charCounter");
+
+messageInput.addEventListener("input", () => {
+  const len = messageInput.value.length;
+  charCounter.textContent = `${len} / 2000`;
+  charCounter.classList.toggle("near-limit", len > 1800);
+});
+
+async function resetChat() {
+  const confirmed = confirm("Start a new chat? This will clear your current conversation.");
+  if (!confirmed) return;
+
+  try {
+    await fetch(`${API_BASE}/reset/${SESSION_ID}`, { method: "POST" });
+  } catch (error) {
+    // backend reset endpoint optional — ignore failure, still clear locally
+  }
+
+  localStorage.removeItem("sadabahar_session_id");
+  window.location.reload();
+}
