@@ -11,6 +11,7 @@
 </head>
 <body>
 
+  <!--  Header  -->
   <header class="header">
     <div class="header-inner">
       <div class="brand">
@@ -32,32 +33,12 @@
     </div>
   </header>
 
-  <div class="input-bar">
-    <textarea
-      id="messageInput"
-      class="msg-input"
-      placeholder="Ask about our menu, delivery, specials…"
-      rows="1"
-      maxlength="2000"
-    ></textarea>
-    <button class="send-btn" id="sendBtn" onclick="sendMessage()" aria-label="Send message">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-        <path d="M2 10L18 2L10 18L9 11L2 10Z" fill="white" stroke="white" stroke-width="1" stroke-linejoin="round"/>
-      </svg>
-    </button>
-  </div>
-  <div class="input-meta">
-    <span class="char-counter" id="charCounter">0 / 2000</span>
-    <p class="input-hint">Delivery within 10 km · Powered by Gemini AI</p>
-  </div>
-
+  <!--  Chat Window  -->
   <main class="chat-wrap">
     <div class="chat-window" id="chatWindow">
-      <div class="skeleton-row" id="historySkeleton">
-        <div class="avatar skeleton-avatar"></div>
-        <div class="skeleton-bubble"></div>
-      </div>
-      <div class="msg-row bot-row" id="welcomeRow">
+
+      <!-- Welcome message -->
+      <div class="msg-row bot-row">
         <div class="avatar">S</div>
         <div class="bubble bot-bubble">
           <p>Assalamu Alaikum! 👋 I'm <strong>Sada</strong>, your personal food guide at Sadabahar Restaurant.</p>
@@ -65,8 +46,10 @@
           <span class="timestamp" id="welcomeTime"></span>
         </div>
       </div>
+
     </div>
 
+    <!--  Typing Indicator  -->
     <div class="typing-indicator" id="typingIndicator" style="display:none;">
       <div class="avatar">S</div>
       <div class="typing-bubble">
@@ -74,6 +57,7 @@
       </div>
     </div>
 
+    <!--  Quick Suggestions  -->
     <div class="suggestions" id="suggestions">
       <button class="suggestion-btn" onclick="sendSuggestion(this)">🍕 View Pizzas</button>
       <button class="suggestion-btn" onclick="sendSuggestion(this)">🍔 View Burgers</button>
@@ -81,6 +65,7 @@
       <button class="suggestion-btn" onclick="sendSuggestion(this)">🕐 Opening Hours</button>
     </div>
 
+    <!--  Input Bar  -->
     <div class="input-bar">
       <textarea
         id="messageInput"
@@ -95,7 +80,7 @@
         </svg>
       </button>
     </div>
-    <p class="input-hint">Delivery within 10 km · Powered by Gemini AI</p>
+    <p class="input-hint">Developed by <a href="https://vishalsahilai.vercel.app/" target="_blank" rel="noopener noreferrer">Vishal Sahil</a></p>
   </main>
 
   <script src="app.js"></script>
