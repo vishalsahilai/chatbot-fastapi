@@ -1,3 +1,8 @@
+"""
+LLM Service with API Key Rotation for Gemini
+Automatically rotates to next key when quota is exceeded.
+"""
+
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import SystemMessage, HumanMessage
 from tenacity import retry, stop_after_attempt, wait_exponential, RetryError
@@ -7,84 +12,111 @@ from prompts.system_prompt import SYSTEM_PROMPT
 from utils.logger import logger
 
 
+# ── API Key Pool ──────────────────────────────────────────────
+API_KEYS = [
+    settings.google_api_key_1,
+    settings.google_api_key_2,
+    settings.google_api_key_3,
+]
 
-# LLM Instance (shared, thread-safe)
-_llm = ChatGoogleGenerativeAI(
-    model=settings.gemini_model,
-    temperature=settings.llm_temperature,
-    max_output_tokens=settings.llm_max_tokens,
-    google_api_key=settings.google_api_key,
-)
+# Filter out empty keys
+API_KEYS = [k for k in API_KEYS if k and k != ""]
 
-# Summarizer LLM (lower temp for consistency)
-_summarizer_llm = ChatGoogleGenerativeAI(
-    model=settings.gemini_model,
-    temperature=0.1,
-    max_output_tokens=300,
-    google_api_key=settings.google_api_key,
-)
+# Current key index tracker
+_current_key_index = 0
 
-def get_llm() -> ChatGoogleGenerativeAI:
-    """Returns the main chat LLM instance."""
-    return _llm
 
-def get_summarizer_llm() -> ChatGoogleGenerativeAI:
-    """Returns the summarizer LLM instance (lower temperature)."""
-    return _summarizer_llm
+def _get_current_key() -> str:
+    return API_KEYS[_current_key_index]
 
-@retry(
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=1, min=1, max=10),
-)
+
+def _rotate_key():
+    """Move to next available API key."""
+    global _current_key_index
+    _current_key_index = (_current_key_index + 1) % len(API_KEYS)
+    logger.warning(f"Rotated to API key index: {_current_key_index}")
+
+
+def _build_llm(api_key: str, temperature: float = 0.7, max_tokens: int = 512):
+    """Build a Gemini LLM instance with given API key."""
+    return ChatGoogleGenerativeAI(
+        model=settings.gemini_model,
+        temperature=temperature,
+        max_output_tokens=max_tokens,
+        google_api_key=api_key,
+    )
+
+
 async def invoke_llm(user_context: str) -> str:
     """
-    Sends a message to the LLM with the system prompt.
-
-    Args:
-        user_context : The assembled context string from context_builder.
-                       This may include summaries + current user message,
-                       or just the raw message depending on the phase.
-
-    Returns:
-        The LLM's text response as a string.
-
-    Raises:
-        RuntimeError if all retry attempts fail.
+    Invoke LLM with automatic API key rotation on quota errors.
+    Tries all available keys before giving up.
     """
-    try:
-        messages = [
-            SystemMessage(content=SYSTEM_PROMPT),
-            HumanMessage(content=user_context),
-        ]
+    if not API_KEYS:
+        raise RuntimeError("No API keys configured.")
 
-        response = await _llm.ainvoke(messages)
-        # Gemini can return content as a list or a string
-        if isinstance(response.content, list):
-            reply = " ".join(
-                block.get("text", "") if isinstance(block, dict) else str(block)
-                for block in response.content
-            ).strip()
-        else:
-            reply = response.content.strip()
+    last_error = None
 
-        logger.debug(f"Gemini response ({len(reply)} chars): {reply[:100]}...")
-        return reply
+    for attempt in range(len(API_KEYS)):
+        current_key = _get_current_key()
+        try:
+            llm = _build_llm(current_key)
+            messages = [
+                SystemMessage(content=SYSTEM_PROMPT),
+                HumanMessage(content=user_context),
+            ]
+            response = await llm.ainvoke(messages)
 
-    except Exception as e:
-        logger.error(f"Gemini invocation failed: {e}")
-        raise
+            # Handle Gemini response content type
+            if isinstance(response.content, list):
+                reply = " ".join(
+                    block.get("text", "") if isinstance(block, dict) else str(block)
+                    for block in response.content
+                ).strip()
+            else:
+                reply = response.content.strip()
+
+            logger.debug(f"Response from key index {_current_key_index}")
+            return reply
+
+        except Exception as e:
+            error_msg = str(e).lower()
+            # Check if it's a quota/rate limit error
+            if any(keyword in error_msg for keyword in [
+                "quota", "rate limit", "resource exhausted",
+                "429", "limit exceeded", "too many requests"
+            ]):
+                logger.warning(f"Key index {_current_key_index} quota exceeded. Rotating...")
+                _rotate_key()
+                last_error = e
+            else:
+                # Non-quota error — don't rotate, just raise
+                logger.error(f"LLM error (non-quota): {e}")
+                raise
+
+    # All keys exhausted
+    logger.error("All API keys exhausted!")
+    raise RuntimeError("All Gemini API keys have exceeded their quota.") from last_error
 
 
 async def safe_invoke_llm(user_context: str) -> str:
-    """
-    Wrapper around invoke_llm with top-level error handling.
-    Raises HTTPException-friendly errors if all retries fail.
-    """
+    """Wrapper with top-level error handling."""
     try:
         return await invoke_llm(user_context)
-    except RetryError:
-        logger.error("Gemini failed after all retry attempts.")
-        raise
     except Exception as e:
-        logger.error(f"Unexpected Gemini error: {e}")
+        logger.error(f"safe_invoke_llm failed: {e}")
         raise
+
+
+def get_summarizer_llm():
+    """Returns summarizer LLM with current active key."""
+    return _build_llm(
+        _get_current_key(),
+        temperature=0.1,
+        max_tokens=300,
+    )
+
+
+def get_llm():
+    """Returns main LLM with current active key."""
+    return _build_llm(_get_current_key())

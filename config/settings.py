@@ -8,11 +8,13 @@ class Settings(BaseSettings):
         case_sensitive=False,
     )
 
-    #LLM
-    google_api_key: str = "changeme"
+    # (Gemini) 
+    google_api_key_1: str = ""
+    google_api_key_2: str = ""
+    google_api_key_3: str = ""
     gemini_model: str = "gemini-2.5-flash"
     llm_temperature: float = 0.7
-    llm_max_tokens: int = 512 #tokens ≈ roughly 350-400 words
+    llm_max_tokens: int = 512
 
     #App
     #"development"	Running locally on your machine 
