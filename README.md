@@ -240,45 +240,44 @@ Then visit: `http://localhost:3000`
 ## Environment Variables
 
 ```env
-# ─────────────────────────────────────────
-# Gemini API Keys (supports up to 4 keys)
+
+# Gemini API Keys (supports up to 3 keys)
 # Get free keys at: aistudio.google.com
 # Automatically rotates when quota is hit
-# ─────────────────────────────────────────
+
 GOOGLE_API_KEY_1=your-gemini-key-1
 GOOGLE_API_KEY_2=your-gemini-key-2
 GOOGLE_API_KEY_3=your-gemini-key-3
-GOOGLE_API_KEY_4=your-gemini-key-4
 
 GEMINI_MODEL=gemini-2.5-flash-preview-05-20
 LLM_TEMPERATURE=0.7
 LLM_MAX_TOKENS=512
 
-# ─────────────────────────────────────────
+
 # App Configuration
-# ─────────────────────────────────────────
+
 APP_ENV=development
 APP_HOST=0.0.0.0
 APP_PORT=8000
 DEBUG=true
 
-# ─────────────────────────────────────────
+
 # Memory Configuration
-# ─────────────────────────────────────────
+
 MEMORY_BACKEND=dict
 MAX_SUMMARIES=5
 
-# ─────────────────────────────────────────
+
 # Redis (optional — production only)
-# ─────────────────────────────────────────
+
 REDIS_HOST=localhost
 REDIS_PORT=6379
 REDIS_DB=0
 REDIS_PASSWORD=
 
-# ─────────────────────────────────────────
+
 # CORS
-# ─────────────────────────────────────────
+
 CORS_ORIGINS=["http://localhost:3000","http://127.0.0.1:3000"]
 ```
 
