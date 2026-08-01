@@ -1,17 +1,14 @@
-# 🍕 Sadabahar Restaurant Chatbot System
+# 🍕 Sadabahar Restaurant Chatbot
 
-> A production-ready AI-powered restaurant chatbot built with FastAPI, LangChain, and a hybrid summarization memory system.
+> A production-ready AI-powered restaurant chatbot built with FastAPI, LangChain, and Google Gemini — featuring hybrid summarization memory, session management, and a sleek Black & Red themed frontend.
 
 ---
 
-## 🎨 Theme
+## 🖥️ Live Preview
 
-| Property | Value |
-|---|---|
-| **Primary Color** | `#FF0000` (Red) |
-| **Background Color** | `#0A0A0A` (Black) |
-| **Accent Color** | `#CC0000` (Dark Red) |
-| **Font** | Inter / Roboto |
+![Sadabahar Restaurant Chatbot UI](./docs/sadabahar-Restaurant_demo.png)
+
+> **Try it live:** [sadabahar-restaurant-bot.vercel.app](https://sadabahar-restaurant-bot.vercel.app)
 
 ---
 
@@ -21,27 +18,31 @@
 2. [System Architecture](#system-architecture)
 3. [Features](#features)
 4. [File Structure](#file-structure)
-5. [Setup & Installation](#setup--installation)
-6. [Environment Variables](#environment-variables)
-7. [API Reference](#api-reference)
-8. [Memory System](#memory-system)
-9. [Menu System](#menu-system)
-10. [Frontend](#frontend)
-11. [Development Phases](#development-phases)
-12. [Error Handling](#error-handling)
-13. [Testing](#testing)
-14. [Production Deployment](#production-deployment)
+5. [Prerequisites](#prerequisites)
+6. [Setup & Installation](#setup--installation)
+7. [Environment Variables](#environment-variables)
+8. [API Reference](#api-reference)
+9. [Memory System](#memory-system)
+10. [Menu System](#menu-system)
+11. [Frontend](#frontend)
+12. [Development Phases](#development-phases)
+13. [Error Handling](#error-handling)
+14. [Testing](#testing)
+15. [Production Deployment](#production-deployment)
+16. [Tech Stack](#tech-stack)
+17. [Author](#author)
 
 ---
 
 ## Overview
 
-**Sadabahar Restaurant Chatbot** is a full-stack conversational AI system designed to handle customer interactions for a restaurant. It provides:
+**Sadabahar Restaurant Chatbot** is a full-stack conversational AI system built for restaurant customer interactions. It provides:
 
-- Real-time menu recommendations
+- Real-time menu recommendations with exact prices
 - Order guidance and delivery information
-- Session-isolated conversations (no cross-user data leakage)
+- Session-isolated conversations — no cross-user data leakage
 - Intelligent hybrid memory with progressive summarization
+- Anti-hallucination system — only recommends items from the defined menu
 - A sleek Black & Red themed frontend
 
 The system is built to be **production-ready**, **modular**, and **fully extensible**.
@@ -74,7 +75,7 @@ The system is built to be **production-ready**, **modular**, and **fully extensi
 │  │  │  - update()     │   │    - Context Builder     │ │   │
 │  │  │  - get_context()│   │    - Response Generator  │ │   │
 │  │  └────────┬────────┘   └──────────────────────────┘ │   │
-│  └───────────┼────────────────────────────────────────--┘   │
+│  └───────────┼──────────────────────────────────────────┘   │
 └──────────────┼──────────────────────────────────────────────┘
                │
                ▼
@@ -98,52 +99,56 @@ The system is built to be **production-ready**, **modular**, and **fully extensi
 ### Core Features
 - **Session Management** — Each user gets a unique `session_id`; conversations are fully isolated
 - **Hybrid Summarization Memory** — Smart 3-phase memory that keeps context without bloating the LLM prompt
-- **LangChain LLM Integration** — Powered by OpenAI GPT or any compatible LLM
-- **Menu-Aware Responses** — Bot only recommends items from the defined JSON menu
+- **LangChain + Gemini Integration** — Powered by Google Gemini via LangChain
+- **API Key Rotation** — Automatically rotates between multiple Gemini API keys when quota is exceeded
+- **Menu-Aware Responses** — Bot only recommends items from the defined menu
 - **Delivery Logic** — Enforces 10 km delivery radius and 9 AM–11 PM timing rules
+- **Anti-Hallucination** — Strict system prompt prevents AI from making up menu items or prices
 
 ### Technical Features
 - REST API with FastAPI
 - CORS-enabled for frontend integration
-- Structured logging
+- Structured logging with Loguru
 - Graceful error handling (empty input, LLM failure, invalid sessions)
 - Modular codebase (routes, services, memory, utils)
+- Retry logic with exponential backoff via Tenacity
 
 ---
 
 ## File Structure
 
 ```
-sadabahar-chatbot/
+sadabahar-restaurant-chatbot/
 │
-├── README.md                        ← This file
-├── requirements.txt                 ← Python dependencies
-├── .env                             ← Environment variables (never commit)
-├── .env.example                     ← Example env file (safe to commit)
+├── README.md
+├── requirements.txt
+├── render.yaml                      ← Render deployment config
+├── .env                             ← never commit
+├── .env.example
 ├── .gitignore
 │
-├── main.py                          ← FastAPI app entry point
+├── main.py                          ← FastAPI entry point
 │
 ├── routes/
 │   ├── __init__.py
-│   ├── chat.py                      ← POST /chat endpoint
-│   └── health.py                    ← GET /health endpoint
+│   ├── chat.py                      ← POST /chat
+│   └── health.py                    ← GET /health
 │
 ├── services/
 │   ├── __init__.py
-│   ├── chat_service.py              ← Core chat orchestration logic
-│   └── llm_service.py               ← LangChain LLM setup & invocation
+│   ├── chat_service.py              ← Chat pipeline orchestration
+│   └── llm_service.py              ← Gemini LLM + key rotation
 │
 ├── memory/
 │   ├── __init__.py
-│   ├── memory_manager.py            ← Session memory store (dict/Redis)
-│   ├── summarizer.py                ← summarize_conversation() logic
-│   └── context_builder.py          ← get_context_for_llm() logic
+│   ├── memory_manager.py            ← Session store (dict/Redis)
+│   ├── summarizer.py                ← Summarization logic
+│   └── context_builder.py          ← 3-phase context builder
 │
 ├── utils/
 │   ├── __init__.py
-│   ├── validators.py                ← Input validation helpers
-│   ├── logger.py                    ← Structured logging setup
+│   ├── validators.py                ← Input validation
+│   ├── logger.py                    ← Structured logging
 │   └── menu.py                      ← Menu JSON definition
 │
 ├── config/
@@ -151,7 +156,7 @@ sadabahar-chatbot/
 │   └── settings.py                  ← Pydantic settings / env loader
 │
 ├── prompts/
-│   └── system_prompt.py             ← Restaurant system prompt template
+│   └── system_prompt.py             ← Restaurant system prompt
 │
 ├── frontend/
 │   ├── index.html                   ← Chat UI (Black & Red theme)
@@ -160,41 +165,45 @@ sadabahar-chatbot/
 │
 └── tests/
     ├── __init__.py
-    ├── test_chat.py                  ← Chat endpoint tests
-    ├── test_memory.py                ← Memory logic unit tests
-    └── test_llm.py                  ← LLM service tests
+    ├── test_chat.py
+    └── test_memory.py
 ```
+
+---
+
+## Prerequisites
+
+| Tool | Version |
+|---|---|
+| Python | **3.10 or higher, below 3.12** |
+| pip | Latest |
+| Git | Latest |
+| Google Gemini API Key | Required (free at aistudio.google.com) |
+| Redis | Optional (for production memory) |
+
+> ⚠️ **Important:** Python version must be **≥ 3.10 and < 3.12**. Python 3.12+ may cause dependency conflicts with some LangChain packages.
 
 ---
 
 ## Setup & Installation
 
-### Prerequisites
-
-| Tool | Version |
-|---|---|
-| Python | 3.10+ |
-| pip | Latest |
-| Git | Latest |
-| OpenAI API Key | Required |
-| Redis (optional) | 7.x for production |
-
 ### Step 1 — Clone the Repository
 
 ```bash
-git clone https://github.com/your-org/sadabahar-chatbot.git
-cd sadabahar-chatbot
+git clone https://github.com/vishalsahilai/sadabahar-restaurant-chatbot.git
+cd sadabahar-restaurant-chatbot
 ```
 
-### Step 2 — Create a Virtual Environment
+### Step 2 — Create Virtual Environment
 
 ```bash
+# Create venv
 python -m venv venv
 
-# On macOS/Linux
+# Activate on macOS/Linux
 source venv/bin/activate
 
-# On Windows
+# Activate on Windows
 venv\Scripts\activate
 ```
 
@@ -208,21 +217,18 @@ pip install -r requirements.txt
 
 ```bash
 cp .env.example .env
-# Edit .env and add your OpenAI API key and other settings
+# Open .env and add your Gemini API key(s)
 ```
 
 ### Step 5 — Run the Backend
 
 ```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+python -m uvicorn main:app --reload
 ```
 
 ### Step 6 — Open the Frontend
 
-Open `frontend/index.html` in your browser, or serve it:
-
 ```bash
-# Using Python's built-in server
 cd frontend
 python -m http.server 3000
 ```
@@ -233,14 +239,18 @@ Then visit: `http://localhost:3000`
 
 ## Environment Variables
 
-Create a `.env` file in the project root:
-
 ```env
 # ─────────────────────────────────────────
-# LLM Configuration
+# Gemini API Keys (supports up to 4 keys)
+# Get free keys at: aistudio.google.com
+# Automatically rotates when quota is hit
 # ─────────────────────────────────────────
-OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxx
-OPENAI_MODEL=gpt-4o-mini
+GOOGLE_API_KEY_1=your-gemini-key-1
+GOOGLE_API_KEY_2=your-gemini-key-2
+GOOGLE_API_KEY_3=your-gemini-key-3
+GOOGLE_API_KEY_4=your-gemini-key-4
+
+GEMINI_MODEL=gemini-2.5-flash-preview-05-20
 LLM_TEMPERATURE=0.7
 LLM_MAX_TOKENS=512
 
@@ -255,11 +265,11 @@ DEBUG=true
 # ─────────────────────────────────────────
 # Memory Configuration
 # ─────────────────────────────────────────
-MEMORY_BACKEND=dict          # Options: dict | redis
+MEMORY_BACKEND=dict
 MAX_SUMMARIES=5
 
 # ─────────────────────────────────────────
-# Redis (only if MEMORY_BACKEND=redis)
+# Redis (optional — production only)
 # ─────────────────────────────────────────
 REDIS_HOST=localhost
 REDIS_PORT=6379
@@ -269,7 +279,7 @@ REDIS_PASSWORD=
 # ─────────────────────────────────────────
 # CORS
 # ─────────────────────────────────────────
-CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+CORS_ORIGINS=["http://localhost:3000","http://127.0.0.1:3000"]
 ```
 
 ---
@@ -278,10 +288,9 @@ CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 
 ### `POST /chat`
 
-Send a user message to the chatbot.
+Send a message to the restaurant chatbot.
 
-**Request Body:**
-
+**Request:**
 ```json
 {
   "session_id": "user_abc123",
@@ -290,25 +299,22 @@ Send a user message to the chatbot.
 ```
 
 **Success Response `200 OK`:**
-
 ```json
 {
   "session_id": "user_abc123",
-  "response": "We have two amazing pizzas — Margherita and Pepperoni! 🍕 The Margherita is a classic with fresh mozzarella and basil, while the Pepperoni is loaded with spicy pepperoni slices. Which one would you like to order?",
+  "response": "We have amazing pizzas! 🍕 Margherita (Small PKR 750, Medium PKR 1,250, Large PKR 1,750) and Pepperoni (Small PKR 900, Medium PKR 1,450, Large PKR 2,050). Which size would you like?",
   "message_count": 1
 }
 ```
 
-**Error Response `400 Bad Request`:**
-
+**Error `400 Bad Request`:**
 ```json
 {
   "detail": "Message cannot be empty."
 }
 ```
 
-**Error Response `503 Service Unavailable`:**
-
+**Error `503 Service Unavailable`:**
 ```json
 {
   "detail": "LLM service is temporarily unavailable. Please try again."
@@ -319,16 +325,14 @@ Send a user message to the chatbot.
 
 ### `GET /health`
 
-Check if the service is running.
-
-**Response `200 OK`:**
-
 ```json
 {
   "status": "healthy",
   "service": "Sadabahar Restaurant Chatbot",
   "version": "1.0.0",
-  "timestamp": "2025-07-25T10:30:00Z"
+  "environment": "production",
+  "memory_backend": "dict",
+  "timestamp": "2026-08-01T05:16:00Z"
 }
 ```
 
@@ -336,183 +340,98 @@ Check if the service is running.
 
 ## Memory System
 
-This is the core intelligence of the chatbot. It uses a **3-phase hybrid summarization** approach to keep LLM context lean and relevant.
-
-### How It Works
+The core intelligence of the chatbot. Uses a **3-phase hybrid summarization** approach to keep LLM context lean and relevant.
 
 ```
-Message 1
-  └─→  Send directly to LLM (no prior context)
+Message 1  →  Send directly to LLM (no prior context)
 
-Message 2
-  └─→  Send full conversation: [msg1 + bot_response1 + msg2]
+Message 2  →  Send full previous exchange + current message
 
-Message 3+
-  └─→  DO NOT send full history
-       Instead:
-         1. Summarize previous interaction(s)
-         2. Store summary (keep last 5 max)
-         3. Send to LLM:
-            [All Summaries] + [Current User Message]
+Message 3+ →  DO NOT send full history
+              Instead:
+                1. Summarize previous interactions
+                2. Store summary (keep last 5 max)
+                3. Send: [Summaries] + [Current Message]
 ```
 
 ### Summary Structure
 
-Each summary stored in memory follows this format:
-
 ```json
 {
   "user_intent": "User asked about pizza options",
-  "bot_response": "Recommended Margherita and Pepperoni pizzas",
-  "context": "User appears interested in ordering pizza, exploring menu"
+  "bot_response": "Recommended Margherita and Pepperoni with prices",
+  "context": "User is interested in pizza, may want to order"
 }
 ```
 
 ### Memory Store Structure
 
 ```python
-SESSION_STORE = {
+{
   "session_id_xyz": {
-    "summaries": [
-      {
-        "user_intent": "...",
-        "bot_response": "...",
-        "context": "..."
-      }
-      # max 5 entries — oldest dropped when limit reached
-    ],
-    "last_messages": [
-      {"role": "user", "content": "..."},
-      {"role": "assistant", "content": "..."}
-    ]
+    "summaries": [...],      # max 5 rolling summaries
+    "last_messages": [...],  # last user + bot message
+    "message_count": 5       # total messages in session
   }
 }
 ```
-
-### Core Memory Functions
-
-| Function | Description |
-|---|---|
-| `summarize_conversation(user_msg, bot_response, context)` | Calls LLM to generate a structured summary of a single exchange |
-| `update_memory(session_id, user_msg, bot_response)` | Updates the session's summaries list and last_messages; enforces max 5 summaries |
-| `get_context_for_llm(session_id, current_message)` | Assembles the correct context block based on message count (phase 1, 2, or 3+) |
 
 ---
 
 ## Menu System
 
-The menu is defined as a static JSON object in `utils/menu.py`. The LLM is **strictly instructed** to only recommend items from this list — no hallucination of menu items.
+Defined in `utils/menu.py` as a JSON object. The LLM is strictly instructed to only use this data — no hallucination allowed.
 
 ```json
 {
-  "pizza": [
-    "Margherita",
-    "Pepperoni"
-  ],
-  "burger": [
-    "Zinger Burger",
-    "Beef Burger"
-  ],
-  "drinks": [
-    "Coca-Cola",
-    "Mango Lassi",
-    "Mineral Water"
-  ],
-  "sides": [
-    "Garlic Bread",
-    "Coleslaw",
-    "French Fries"
-  ],
-  "desserts": [
-    "Chocolate Brownie",
-    "Gulab Jamun"
-  ]
+  "pizza": ["Margherita", "Pepperoni", "Chicken Tikka", "BBQ Chicken", "Supreme"],
+  "burger": ["Zinger Burger", "Beef Burger", "Crispy Chicken", "Grilled Chicken"],
+  "drinks": ["Coca-Cola", "Mango Lassi", "Mineral Water", "Mint Margarita"],
+  "sides": ["Garlic Bread", "French Fries", "Coleslaw", "Chicken Nuggets"],
+  "desserts": ["Chocolate Brownie", "Gulab Jamun", "Ice Cream Sundae"],
+  "bbq": ["Chicken Tikka", "Chicken Boti", "Malai Boti"],
+  "pakistani": ["Chicken Biryani", "Chicken Karahi", "Nihari", "Haleem"],
+  "deals": ["Family Deal 1", "Family Deal 2", "Combo 1", "Combo 2"]
 }
 ```
-
-The full menu is injected into the system prompt at startup so the LLM always has access to it.
 
 ---
 
 ## Frontend
 
-The frontend is a single-page chat interface served from the `frontend/` folder.
+Single-page chat UI served from the `frontend/` folder.
 
-### Design Specs
+### Design
 
-| Element | Style |
+| Element | Value |
 |---|---|
-| Background | `#0A0A0A` (near black) |
-| Chat bubble (bot) | `#1A0000` with red border |
-| Chat bubble (user) | `#CC0000` |
-| Input bar | Dark gray with red focus ring |
-| Send button | Red with hover glow |
-| Font | `Inter`, sans-serif |
-| Header | Restaurant name + logo, red accent |
+| Background | `#0A0A0A` (Black) |
+| Primary Color | `#CC0000` (Red) |
+| Bot bubble | Dark gray with red border |
+| User bubble | Red |
+| Font | Inter + Playfair Display |
+| Input | Dark with red focus glow |
+| Send button | Red with hover glow effect |
 
-### How It Connects
-
-The frontend uses the native `fetch` API to call the backend:
-
-```javascript
-// Auto-generates a session_id stored in localStorage
-const sessionId = localStorage.getItem('session_id') || generateUUID();
-
-const response = await fetch('http://localhost:8000/chat', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    session_id: sessionId,
-    message: userInput
-  })
-});
-```
+### Features
+- Auto-generates `session_id` stored in `localStorage`
+- Quick suggestion buttons (View Pizzas, View Burgers, Delivery Info, Opening Hours)
+- Typing indicator with animated red dots
+- Timestamps on every message
+- Mobile responsive
+- Send on Enter, Shift+Enter for newline
 
 ---
 
 ## Development Phases
 
-### Phase 1 — Setup
-- Initialize project structure
-- Configure virtual environment
-- Install base dependencies
-- Set up `.env` and config loader
-
-### Phase 2 — Backend
-- Initialize FastAPI app in `main.py`
-- Configure CORS and middleware
-- Set up structured logging
-- Register routes
-
-### Phase 3 — LLM
-- Set up LangChain with OpenAI
-- Write system prompt in `prompts/system_prompt.py`
-- Inject menu and restaurant rules into prompt
-- Test basic LLM invocation
-
-### Phase 4 — Memory
-- Implement `memory_manager.py` with in-memory dict store
-- Implement `summarizer.py` — calls LLM to generate summaries
-- Implement `context_builder.py` — selects correct context based on message count
-- Unit test all three memory functions
-
-### Phase 5 — API
-- Implement `POST /chat` route with full memory integration
-- Implement `GET /health` route
-- Add input validation and error handling
-- Test all endpoints with Postman/cURL
-
-### Phase 6 — Frontend
-- Build chat UI in `frontend/index.html`
-- Style with Black & Red theme in `style.css`
-- Connect to backend via `fetch` in `app.js`
-- Test end-to-end conversation flow
-
-### Phase 7 — Testing
-- Write unit tests for memory logic
-- Write integration tests for chat endpoint
-- Load test for concurrent sessions
-- Verify no cross-session data leakage
+- **Phase 1** — Project setup + virtual environment
+- **Phase 2** — FastAPI backend + CORS middleware
+- **Phase 3** — Gemini LLM integration + system prompt
+- **Phase 4** — Hybrid summarization memory system
+- **Phase 5** — API endpoints + input validation
+- **Phase 6** — Black & Red frontend UI
+- **Phase 7** — Testing + deployment
 
 ---
 
@@ -523,34 +442,31 @@ const response = await fetch('http://localhost:8000/chat', {
 | Empty message | `400` | `"Message cannot be empty."` |
 | Message too long (>2000 chars) | `400` | `"Message too long."` |
 | LLM timeout or failure | `503` | `"LLM service unavailable."` |
-| Session not found (auto-created) | `200` | New session initialized transparently |
-| Invalid JSON body | `422` | FastAPI default validation error |
+| All API keys quota exceeded | `503` | `"LLM service unavailable."` |
+| Session not found | `200` | New session auto-created |
+| Invalid JSON body | `422` | FastAPI validation error |
 
 ---
 
 ## Testing
 
-### Run All Tests
-
 ```bash
+# Run all tests
 pytest tests/ -v
-```
 
-### Run Specific Test Files
-
-```bash
+# Run specific tests
 pytest tests/test_memory.py -v
 pytest tests/test_chat.py -v
 ```
 
-### Manual API Test with cURL
+### Manual Test with cURL
 
 ```bash
 # Health check
-curl http://localhost:8000/health
+curl https://your-backend.onrender.com/health
 
-# Send a chat message
-curl -X POST http://localhost:8000/chat \
+# Send a message
+curl -X POST https://your-backend.onrender.com/chat \
   -H "Content-Type: application/json" \
   -d '{"session_id": "test123", "message": "What burgers do you have?"}'
 ```
@@ -559,51 +475,33 @@ curl -X POST http://localhost:8000/chat \
 
 ## Production Deployment
 
-### Switch to Redis Memory
+### Backend → Render (Free)
 
-In `.env`:
+```yaml
+# render.yaml
+services:
+  - type: web
+    name: sadabahar-chatbot
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m uvicorn main:app --host 0.0.0.0 --port $PORT
+```
+
+### Frontend → Netlify (Free)
+
+1. Go to netlify.com
+2. Drag and drop your `frontend/` folder
+3. Done — live in 30 seconds
+
+### Switch to Redis Memory
 
 ```env
 MEMORY_BACKEND=redis
 REDIS_HOST=your-redis-host
 REDIS_PORT=6379
-REDIS_PASSWORD=your-redis-password
+REDIS_PASSWORD=your-password
 ```
-
-### Run with Gunicorn
-
-```bash
-pip install gunicorn
-gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
-```
-
-### Docker (Optional)
-
-```dockerfile
-FROM python:3.11-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY . .
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-```
-
-```bash
-docker build -t sadabahar-chatbot .
-docker run -p 8000:8000 --env-file .env sadabahar-chatbot
-```
-
----
-
-## Restaurant Info (Injected into System Prompt)
-
-| Field | Value |
-|---|---|
-| **Name** | Sadabahar Restaurant |
-| **Delivery Radius** | 10 km |
-| **Operating Hours** | 9:00 AM – 11:00 PM |
-| **Tone** | Friendly, helpful, enthusiastic |
-| **Hallucination Policy** | Strictly prohibited — only menu items allowed |
 
 ---
 
@@ -611,14 +509,27 @@ docker run -p 8000:8000 --env-file .env sadabahar-chatbot
 
 | Layer | Technology |
 |---|---|
-| Backend | FastAPI (Python 3.10+) |
+| Backend | FastAPI (Python 3.10–3.11) |
 | LLM Framework | LangChain |
-| LLM Provider | OpenAI GPT-4o-mini (configurable) |
+| LLM Provider | Google Gemini (free tier) |
 | Memory (demo) | In-memory Python dict |
 | Memory (prod) | Redis |
 | Frontend | Vanilla HTML / CSS / JavaScript |
 | Testing | pytest |
+| Logging | Loguru |
 | Server | Uvicorn / Gunicorn |
+| Deployment | Render + Netlify (both free) |
+
+---
+
+## Author
+
+**Vishal Sahil** — AI Automation Engineer
+
+- 🌐 Portfolio: [vishalsahilai.vercel.app](https://vishalsahilai.vercel.app)
+- 💼 LinkedIn: [linkedin.com/in/vishal-sahil-ai](https://linkedin.com/in/vishal-sahil-ai)
+- 🐙 GitHub: [github.com/vishalsahilai](https://github.com/vishalsahilai)
+- 📧 Email: vishalsahilofficial@gmail.com
 
 ---
 
@@ -628,4 +539,4 @@ MIT License — Free to use, modify, and distribute.
 
 ---
 
-> Built with ❤️ for Sadabahar Restaurant. Powered by LangChain + FastAPI.
+> Built with ❤️ by Vishal Sahil · Powered by LangChain + Google Gemini
