@@ -38,3 +38,7 @@ def load_and_split_pdf() -> list:
         chunk_overlap=CHUNK_OVERLAP,
         separators=["\n\n", "\n", " .", "!","?", ",", " "]
     )
+
+    chunks = splitter.split_documents(pages)
+    logger.info(f"PDF Split into {len(chunks)} chunks.")
+    return chunks
