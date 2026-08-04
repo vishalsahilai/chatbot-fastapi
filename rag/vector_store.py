@@ -9,3 +9,4 @@ from rag.embeddings import get_embeddings
 from config.settings import settings
 from utils.logger import logger
 
+_vector_store = None
