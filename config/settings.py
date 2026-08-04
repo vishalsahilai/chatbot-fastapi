@@ -22,16 +22,8 @@ class Settings(BaseSettings):
     app_port: int = 8000
     debug: bool = True
 
-    #Memory
-    memory_backend: str = "dict"      # "dict" | "redis" | "both"
-    max_summaries: int = 5
-
-    # Redis 
-    redis_host: str = "localhost"
-    redis_port: int = 6379
-    redis_db: int = 0
-    redis_password: str = ""
-
+    # MongoDB
+    mongodb_uri: str = "mongodb://localhost:27017"
 
 
     #CORS 
