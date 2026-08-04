@@ -50,3 +50,23 @@ def get_vector_store() -> PineconeVectorStore:
         )
         logger.info("Pinecone vector store connected successfully.")
     return _vector_store
+
+def ingest_documents(chunks: list) -> None:
+    """Ingests document chunks into Pinecone with unique IDs to prevent duplicates."""
+    global _vector_store
+    logger.info(f"Ingesting {len(chunks)} document chunks into Pinecone...")
+
+    _ensure_index_exists()
+    # Generate unique IDs to prevent duplicates
+    ids = [hashlib.md5(chunk.page_content.encode()).hexdigest()
+           for chunk in chunks]
+
+    _vector_store = PineconeVectorStore.from_documents(
+        documents=chunks,
+        embedding=get_embeddings(),
+        index_name=settings.pinecone_index_name,
+        pinecone_api_key=settings.pinecone_api_key or os.getenv("PINECONE_API_KEY"),
+        ids=ids # -> prevents duplicates
+    )
+
+    logger.info(f"Successfully ingested {len(chunks)} chunks into Pinecone.")
