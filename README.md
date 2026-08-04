@@ -1,14 +1,14 @@
 # 🍕 Sadabahar Restaurant Chatbot
 
-> A production-ready AI-powered restaurant chatbot built with FastAPI, LangChain, and Google Gemini — featuring hybrid summarization memory, session management, and a sleek Black & Red themed frontend.
+> Production-ready AI restaurant chatbot with hybrid memory, RAG, order placement, MongoDB persistence, and email confirmation.
 
 ---
 
 ## 🖥️ Live Preview
 
-![Sadabahar Restaurant Chatbot UI](./docs/sadabahar-Restaurant_demo.png)
+![Sadabahar Restaurant Chatbot UI](./docs/sadabahar-restaurant-demo.png)
 
-> **Try it live:** [sadabahar-restaurant-bot.vercel.app](https://sadabahar-restaurant-bot.vercel.app)
+> **Live:** [sadabahar-restaurant-bot.vercel.app](https://sadabahar-restaurant-bot.vercel.app)
 
 ---
 
@@ -23,29 +23,22 @@
 7. [Environment Variables](#environment-variables)
 8. [API Reference](#api-reference)
 9. [Memory System](#memory-system)
-10. [Menu System](#menu-system)
-11. [Frontend](#frontend)
-12. [Development Phases](#development-phases)
-13. [Error Handling](#error-handling)
-14. [Testing](#testing)
-15. [Production Deployment](#production-deployment)
-16. [Tech Stack](#tech-stack)
-17. [Author](#author)
+10. [RAG System](#rag-system)
+11. [Customer Recognition](#customer-recognition)
+12. [Order System](#order-system)
+13. [Database Structure](#database-structure)
+14. [Frontend](#frontend)
+15. [Development Phases](#development-phases)
+16. [Error Handling](#error-handling)
+17. [Production Deployment](#production-deployment)
+18. [Tech Stack](#tech-stack)
+19. [Author](#author)
 
 ---
 
 ## Overview
 
-**Sadabahar Restaurant Chatbot** is a full-stack conversational AI system built for restaurant customer interactions. It provides:
-
-- Real-time menu recommendations with exact prices
-- Order guidance and delivery information
-- Session-isolated conversations — no cross-user data leakage
-- Intelligent hybrid memory with progressive summarization
-- Anti-hallucination system — only recommends items from the defined menu
-- A sleek Black & Red themed frontend
-
-The system is built to be **production-ready**, **modular**, and **fully extensible**.
+**Sadabahar Restaurant Chatbot** is a full-stack conversational AI system that handles customer interactions end-to-end — from greeting returning customers by name, to taking orders, saving them to Google Sheets, and sending email confirmations.
 
 ---
 
@@ -53,65 +46,55 @@ The system is built to be **production-ready**, **modular**, and **fully extensi
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        CLIENT (Browser)                     │
-│                   Black & Red Chat UI (HTML/CSS/JS)         │
+│                   Black & Red Chat UI                       │
 └────────────────────────┬────────────────────────────────────┘
-                         │  HTTP POST /chat
+                         │ HTTP POST /chat
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                    FastAPI Backend                           │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐  │
-│  │   Routes     │  │  Middleware  │  │  Error Handlers  │  │
-│  │  /chat       │  │  CORS        │  │  Validation      │  │
-│  │  /health     │  │  Logging     │  │  LLM Fallback    │  │
-│  └──────┬───────┘  └──────────────┘  └──────────────────┘  │
-│         │                                                   │
-│         ▼                                                   │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │               Chat Service                           │   │
-│  │  ┌─────────────────┐   ┌──────────────────────────┐ │   │
-│  │  │  Memory Manager │   │    LangChain LLM Chain   │ │   │
-│  │  │  - summarize()  │   │    - System Prompt       │ │   │
-│  │  │  - update()     │   │    - Context Builder     │ │   │
-│  │  │  - get_context()│   │    - Response Generator  │ │   │
-│  │  └────────┬────────┘   └──────────────────────────┘ │   │
-│  └───────────┼──────────────────────────────────────────┘   │
-└──────────────┼──────────────────────────────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   Memory Storage Layer                      │
-│  In-Memory Dict (Demo) / Redis (Production)                 │
+│  /chat   /order   /health                                   │
 │                                                             │
-│  {                                                          │
-│    "session_id": {                                          │
-│      "summaries": [...],   ← max 5 rolling summaries       │
-│      "last_messages": [...] ← current + last bot response  │
-│    }                                                        │
-│  }                                                          │
+│  ┌─────────────┐  ┌──────────────┐  ┌──────────────────┐   │
+│  │ RAG Service │  │Memory Manager│  │   LLM Service    │   │
+│  │  Pinecone   │  │  MongoDB     │  │ Gemini + Rotation│   │
+│  └─────────────┘  └──────────────┘  └──────────────────┘   │
+│                                                             │
+│  ┌─────────────┐  ┌──────────────┐  ┌──────────────────┐   │
+│  │  Customer   │  │    Order     │  │     Email        │   │
+│  │  Service    │  │   Service    │  │    Service       │   │
+│  └─────────────┘  └──────────────┘  └──────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
+          │                │                    │
+          ▼                ▼                    ▼
+     MongoDB Atlas    Google Sheets        Gmail SMTP
+     (free 512MB)      (free)               (free)
+          │
+     Pinecone
+     (free tier)
 ```
 
 ---
 
 ## Features
 
-### Core Features
-- **Session Management** — Each user gets a unique `session_id`; conversations are fully isolated
-- **Hybrid Summarization Memory** — Smart 3-phase memory that keeps context without bloating the LLM prompt
-- **LangChain + Gemini Integration** — Powered by Google Gemini via LangChain
-- **API Key Rotation** — Automatically rotates between multiple Gemini API keys when quota is exceeded
-- **Menu-Aware Responses** — Bot only recommends items from the defined menu
-- **Delivery Logic** — Enforces 10 km delivery radius and 9 AM–11 PM timing rules
-- **Anti-Hallucination** — Strict system prompt prevents AI from making up menu items or prices
+### Part 1 — Core Chatbot
+- Hybrid 3-phase summarization memory
+- Unlimited session summaries
+- Session isolation per user
+- Gemini API key rotation (up to 4 keys)
+- Anti-hallucination system prompt
+- Black & Red themed frontend
 
-### Technical Features
-- REST API with FastAPI
-- CORS-enabled for frontend integration
-- Structured logging with Loguru
-- Graceful error handling (empty input, LLM failure, invalid sessions)
-- Modular codebase (routes, services, memory, utils)
-- Retry logic with exponential backoff via Tenacity
+### Part 2 — Advanced Features
+- RAG system (Pinecone + HuggingFace + PDF)
+- Customer recognition by phone number
+- Permanent name memory (survives cache clear)
+- Last order reorder suggestion on return visit
+- Order placement through chat
+- Google Sheets order logging
+- Email confirmation on every order
+- MongoDB for all persistent data
+- 2-hour session inactivity expiry
 
 ---
 
@@ -120,53 +103,66 @@ The system is built to be **production-ready**, **modular**, and **fully extensi
 ```
 sadabahar-restaurant-chatbot/
 │
-├── README.md
+├── main.py
 ├── requirements.txt
-├── render.yaml                      ← Render deployment config
-├── .env                             ← never commit
+├── render.yaml
 ├── .env.example
 ├── .gitignore
 │
-├── main.py                          ← FastAPI entry point
-│
 ├── routes/
-│   ├── __init__.py
-│   ├── chat.py                      ← POST /chat
-│   └── health.py                    ← GET /health
+│   ├── chat.py
+│   ├── health.py
+│   └── order.py
 │
 ├── services/
-│   ├── __init__.py
-│   ├── chat_service.py              ← Chat pipeline orchestration
-│   └── llm_service.py              ← Gemini LLM + key rotation
+│   ├── chat_service.py
+│   ├── llm_service.py
+│   ├── customer_service.py
+│   ├── order_service.py
+│   ├── sheets_service.py
+│   └── email_service.py
+│
+├── rag/
+│   ├── rag_service.py
+│   ├── vector_store.py
+│   ├── document_loader.py
+│   └── embeddings.py
 │
 ├── memory/
-│   ├── __init__.py
-│   ├── memory_manager.py            ← Session store (dict/Redis)
-│   ├── summarizer.py                ← Summarization logic
-│   └── context_builder.py          ← 3-phase context builder
+│   ├── memory_manager.py
+│   ├── summarizer.py
+│   └── context_builder.py
+│
+├── database/
+│   ├── mongodb.py
+│   └── models.py
 │
 ├── utils/
-│   ├── __init__.py
-│   ├── validators.py                ← Input validation
-│   ├── logger.py                    ← Structured logging
-│   └── menu.py                      ← Menu JSON definition
+│   ├── validators.py
+│   ├── logger.py
+│   └── menu.py
 │
 ├── config/
-│   ├── __init__.py
-│   └── settings.py                  ← Pydantic settings / env loader
+│   └── settings.py
 │
 ├── prompts/
-│   └── system_prompt.py             ← Restaurant system prompt
+│   └── system_prompt.py
+│
+├── data/
+│   └── Sadabahar_Restaurant.pdf
+│
+├── scripts/
+│   └── ingest.py
 │
 ├── frontend/
-│   ├── index.html                   ← Chat UI (Black & Red theme)
-│   ├── style.css                    ← Custom styles
-│   └── app.js                       ← Fetch API integration
+│   ├── index.html
+│   ├── style.css
+│   └── app.js
 │
 └── tests/
-    ├── __init__.py
     ├── test_chat.py
-    └── test_memory.py
+    ├── test_memory.py
+    └── test_rag.py
 ```
 
 ---
@@ -175,109 +171,88 @@ sadabahar-restaurant-chatbot/
 
 | Tool | Version |
 |---|---|
-| Python | **3.10 or higher, below 3.12** |
+| Python | **≥ 3.10 and < 3.12** |
 | pip | Latest |
 | Git | Latest |
-| Google Gemini API Key | Required (free at aistudio.google.com) |
-| Redis | Optional (for production memory) |
+| Google Gemini API Key | Free — aistudio.google.com |
+| Pinecone Account | Free — pinecone.io |
+| MongoDB Atlas | Free — mongodb.com/atlas |
+| Google Sheets API | Free |
+| Gmail Account | Free |
 
-> ⚠️ **Important:** Python version must be **≥ 3.10 and < 3.12**. Python 3.12+ may cause dependency conflicts with some LangChain packages.
+> ⚠️ Python must be **≥ 3.10 and < 3.12**
 
 ---
 
 ## Setup & Installation
 
-### Step 1 — Clone the Repository
-
 ```bash
 git clone https://github.com/vishalsahilai/sadabahar-restaurant-chatbot.git
 cd sadabahar-restaurant-chatbot
-```
 
-### Step 2 — Create Virtual Environment
-
-```bash
-# Create venv
 python -m venv venv
+source venv/bin/activate        # macOS/Linux
+venv\Scripts\activate           # Windows
 
-# Activate on macOS/Linux
-source venv/bin/activate
-
-# Activate on Windows
-venv\Scripts\activate
-```
-
-### Step 3 — Install Dependencies
-
-```bash
 pip install -r requirements.txt
-```
 
-### Step 4 — Set Up Environment Variables
-
-```bash
 cp .env.example .env
-# Open .env and add your Gemini API key(s)
-```
+# Fill in all values in .env
 
-### Step 5 — Run the Backend
+python scripts/ingest.py        # Run once to load PDF into Pinecone
 
-```bash
 python -m uvicorn main:app --reload
 ```
 
-### Step 6 — Open the Frontend
-
+Frontend:
 ```bash
 cd frontend
 python -m http.server 3000
+# Visit http://localhost:3000
 ```
-
-Then visit: `http://localhost:3000`
 
 ---
 
 ## Environment Variables
 
 ```env
-
-# Gemini API Keys (supports up to 3 keys)
-# Get free keys at: aistudio.google.com
-# Automatically rotates when quota is hit
-
-GOOGLE_API_KEY_1=your-gemini-key-1
-GOOGLE_API_KEY_2=your-gemini-key-2
-GOOGLE_API_KEY_3=your-gemini-key-3
-
+# Gemini (up to 4 keys — auto-rotates on quota)
+GOOGLE_API_KEY_1=
+GOOGLE_API_KEY_2=
+GOOGLE_API_KEY_3=
+GOOGLE_API_KEY_4=
 GEMINI_MODEL=gemini-2.5-flash-preview-05-20
 LLM_TEMPERATURE=0.7
 LLM_MAX_TOKENS=512
 
+# MongoDB
+MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/sadabahar
 
-# App Configuration
+# Pinecone
+PINECONE_API_KEY=
+PINECONE_INDEX_NAME=sadabahar-restaurant
 
+# Google Sheets
+GOOGLE_SHEETS_ID=
+GOOGLE_SERVICE_ACCOUNT_JSON=
+
+# Email
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USERNAME=
+EMAIL_PASSWORD=
+EMAIL_FROM=
+
+# App
 APP_ENV=development
 APP_HOST=0.0.0.0
 APP_PORT=8000
 DEBUG=true
 
-
-# Memory Configuration
-
-MEMORY_BACKEND=dict
-MAX_SUMMARIES=5
-
-
-# Redis (optional — production only)
-
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_DB=0
-REDIS_PASSWORD=
-
+# Memory
+SESSION_TIMEOUT_HOURS=2
 
 # CORS
-
 CORS_ORIGINS=["http://localhost:3000","http://127.0.0.1:3000"]
 ```
 
@@ -286,51 +261,45 @@ CORS_ORIGINS=["http://localhost:3000","http://127.0.0.1:3000"]
 ## API Reference
 
 ### `POST /chat`
-
-Send a message to the restaurant chatbot.
-
-**Request:**
 ```json
-{
-  "session_id": "user_abc123",
-  "message": "What pizzas do you have?"
-}
+// Request
+{ "session_id": "user_abc", "message": "hi", "phone": "0300-1234567" }
+
+// Response
+{ "session_id": "user_abc", "response": "Welcome back Vishal! 😊", "message_count": 1 }
 ```
 
-**Success Response `200 OK`:**
+### `POST /order`
 ```json
+// Request
 {
-  "session_id": "user_abc123",
-  "response": "We have amazing pizzas! 🍕 Margherita (Small PKR 750, Medium PKR 1,250, Large PKR 1,750) and Pepperoni (Small PKR 900, Medium PKR 1,450, Large PKR 2,050). Which size would you like?",
-  "message_count": 1
+  "session_id": "user_abc",
+  "phone": "0300-1234567",
+  "name": "Vishal",
+  "email": "vishal@email.com",
+  "address": "House 12, Street 5, Karachi",
+  "items": [
+    { "name": "Margherita Pizza", "size": "Large", "qty": 1, "price": 1750 }
+  ],
+  "total": 1750
+}
+
+// Response
+{
+  "order_id": "ORD-20260801-001",
+  "status": "confirmed",
+  "message": "Order placed! Confirmation sent to vishal@email.com",
+  "estimated_time": "30-45 minutes"
 }
 ```
-
-**Error `400 Bad Request`:**
-```json
-{
-  "detail": "Message cannot be empty."
-}
-```
-
-**Error `503 Service Unavailable`:**
-```json
-{
-  "detail": "LLM service is temporarily unavailable. Please try again."
-}
-```
-
----
 
 ### `GET /health`
-
 ```json
 {
   "status": "healthy",
   "service": "Sadabahar Restaurant Chatbot",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "environment": "production",
-  "memory_backend": "dict",
   "timestamp": "2026-08-01T05:16:00Z"
 }
 ```
@@ -339,58 +308,132 @@ Send a message to the restaurant chatbot.
 
 ## Memory System
 
-The core intelligence of the chatbot. Uses a **3-phase hybrid summarization** approach to keep LLM context lean and relevant.
-
 ```
-Message 1  →  Send directly to LLM (no prior context)
+Message 1   → direct to LLM
+Message 2   → full previous exchange + current message
+Message 3+  → all summaries + current message (unlimited, no cap)
 
-Message 2  →  Send full previous exchange + current message
-
-Message 3+ →  DO NOT send full history
-              Instead:
-                1. Summarize previous interactions
-                2. Store summary (keep last 5 max)
-                3. Send: [Summaries] + [Current Message]
-```
-
-### Summary Structure
-
-```json
-{
-  "user_intent": "User asked about pizza options",
-  "bot_response": "Recommended Margherita and Pepperoni with prices",
-  "context": "User is interested in pizza, may want to order"
-}
-```
-
-### Memory Store Structure
-
-```python
-{
-  "session_id_xyz": {
-    "summaries": [...],      # max 5 rolling summaries
-    "last_messages": [...],  # last user + bot message
-    "message_count": 5       # total messages in session
-  }
-}
+Session expires after 2 hours of inactivity:
+  → summaries deleted
+  → message count reset
+  → name + phone + last order kept forever in MongoDB
 ```
 
 ---
 
-## Menu System
+## RAG System
 
-Defined in `utils/menu.py` as a JSON object. The LLM is strictly instructed to only use this data — no hallucination allowed.
+```
+PDF → chunks (500 chars) → HuggingFace vectors → Pinecone
 
+User query → vector search → top 4 chunks → injected into LLM
+
+Result: exact prices, delivery charges, FAQs from PDF
+```
+
+Run once:
+```bash
+python scripts/ingest.py
+```
+
+---
+
+## Customer Recognition
+
+```
+New customer:
+  Bot asks phone → asks name → saves to MongoDB
+
+Returning customer (same browser):
+  session_id in localStorage → name loaded → greeted by name
+  If has last order → bot offers to reorder
+
+Returning customer (cache cleared):
+  Bot asks phone → MongoDB lookup → name found → greeted by name
+  Last order shown → reorder option offered
+```
+
+---
+
+## Order System
+
+```
+Customer places order through chat
+         ↓
+POST /order
+         ↓
+Order saved to MongoDB (orders collection)
+Last order updated in MongoDB (customers collection)
+Row added to Google Sheets
+Confirmation email sent to customer
+         ↓
+Bot confirms with order ID + estimated time
+```
+
+### Email Template
+```
+Subject: Order Confirmed — Sadabahar Restaurant 🍕
+
+Dear Vishal,
+
+Your order ORD-20260801-001 has been confirmed!
+
+Items:
+- Margherita Pizza (Large) x1 — PKR 1,750
+
+Total: PKR 1,750 + PKR 100 delivery = PKR 1,850
+Estimated delivery: 30-45 minutes
+
+📞 +92 336 6874263
+```
+
+---
+
+## Database Structure
+
+### customers
 ```json
 {
-  "pizza": ["Margherita", "Pepperoni", "Chicken Tikka", "BBQ Chicken", "Supreme"],
-  "burger": ["Zinger Burger", "Beef Burger", "Crispy Chicken", "Grilled Chicken"],
-  "drinks": ["Coca-Cola", "Mango Lassi", "Mineral Water", "Mint Margarita"],
-  "sides": ["Garlic Bread", "French Fries", "Coleslaw", "Chicken Nuggets"],
-  "desserts": ["Chocolate Brownie", "Gulab Jamun", "Ice Cream Sundae"],
-  "bbq": ["Chicken Tikka", "Chicken Boti", "Malai Boti"],
-  "pakistani": ["Chicken Biryani", "Chicken Karahi", "Nihari", "Haleem"],
-  "deals": ["Family Deal 1", "Family Deal 2", "Combo 1", "Combo 2"]
+  "phone": "0300-1234567",
+  "name": "Vishal",
+  "first_seen": "2026-08-01",
+  "last_seen": "2026-08-01",
+  "last_order": {
+    "order_id": "ORD-20260801-001",
+    "items": [{"name": "Margherita Pizza", "size": "Large", "qty": 1, "price": 1750}],
+    "total": 1750,
+    "date": "2026-08-01"
+  }
+}
+```
+
+### sessions
+```json
+{
+  "session_id": "user_abc123",
+  "phone": "0300-1234567",
+  "name": "Vishal",
+  "summaries": [],
+  "last_messages": [],
+  "message_count": 0,
+  "created_at": "2026-08-01T05:00:00",
+  "last_active": "2026-08-01T05:30:00",
+  "is_expired": false
+}
+```
+
+### orders
+```json
+{
+  "order_id": "ORD-20260801-001",
+  "phone": "0300-1234567",
+  "name": "Vishal",
+  "email": "vishal@email.com",
+  "address": "House 12, Street 5",
+  "items": [],
+  "total": 1750,
+  "status": "confirmed",
+  "created_at": "2026-08-01T05:16:00"
 }
 ```
 
@@ -398,83 +441,53 @@ Defined in `utils/menu.py` as a JSON object. The LLM is strictly instructed to o
 
 ## Frontend
 
-Single-page chat UI served from the `frontend/` folder.
-
-### Design
-
 | Element | Value |
 |---|---|
-| Background | `#0A0A0A` (Black) |
-| Primary Color | `#CC0000` (Red) |
-| Bot bubble | Dark gray with red border |
-| User bubble | Red |
+| Background | `#0A0A0A` |
+| Primary | `#CC0000` |
 | Font | Inter + Playfair Display |
-| Input | Dark with red focus glow |
-| Send button | Red with hover glow effect |
-
-### Features
-- Auto-generates `session_id` stored in `localStorage`
-- Quick suggestion buttons (View Pizzas, View Burgers, Delivery Info, Opening Hours)
-- Typing indicator with animated red dots
-- Timestamps on every message
-- Mobile responsive
-- Send on Enter, Shift+Enter for newline
+| Features | Session ID, typing indicator, timestamps, mobile responsive |
 
 ---
 
 ## Development Phases
 
-- **Phase 1** — Project setup + virtual environment
-- **Phase 2** — FastAPI backend + CORS middleware
-- **Phase 3** — Gemini LLM integration + system prompt
-- **Phase 4** — Hybrid summarization memory system
-- **Phase 5** — API endpoints + input validation
-- **Phase 6** — Black & Red frontend UI
-- **Phase 7** — Testing + deployment
+**Part 1:**
+- Phase 1 — Setup + venv
+- Phase 2 — FastAPI + CORS
+- Phase 3 — Gemini + system prompt
+- Phase 4 — Hybrid memory system
+- Phase 5 — API endpoints
+- Phase 6 — Frontend UI
+- Phase 7 — Testing + deployment
+
+**Part 2:**
+- Phase 8 — RAG (Pinecone + HuggingFace + PDF)
+- Phase 9 — MongoDB integration
+- Phase 10 — Customer recognition + name memory
+- Phase 11 — Order placement system
+- Phase 12 — Google Sheets integration
+- Phase 13 — Email confirmation
+- Phase 14 — End-to-end testing + production
 
 ---
 
 ## Error Handling
 
-| Scenario | HTTP Status | Response |
+| Scenario | Status | Response |
 |---|---|---|
-| Empty message | `400` | `"Message cannot be empty."` |
-| Message too long (>2000 chars) | `400` | `"Message too long."` |
-| LLM timeout or failure | `503` | `"LLM service unavailable."` |
-| All API keys quota exceeded | `503` | `"LLM service unavailable."` |
-| Session not found | `200` | New session auto-created |
-| Invalid JSON body | `422` | FastAPI validation error |
-
----
-
-## Testing
-
-```bash
-# Run all tests
-pytest tests/ -v
-
-# Run specific tests
-pytest tests/test_memory.py -v
-pytest tests/test_chat.py -v
-```
-
-### Manual Test with cURL
-
-```bash
-# Health check
-curl https://your-backend.onrender.com/health
-
-# Send a message
-curl -X POST https://your-backend.onrender.com/chat \
-  -H "Content-Type: application/json" \
-  -d '{"session_id": "test123", "message": "What burgers do you have?"}'
-```
+| Empty message | `400` | Message cannot be empty |
+| Message too long | `400` | Message too long |
+| LLM failure | `503` | LLM service unavailable |
+| All API keys exhausted | `503` | LLM service unavailable |
+| RAG failure | `200` | Falls back to system prompt |
+| MongoDB failure | `503` | Database unavailable |
+| Order validation failed | `400` | Validation error |
+| Email failed | `200` | Order saved, email logged |
 
 ---
 
 ## Production Deployment
-
-### Backend → Render (Free)
 
 ```yaml
 # render.yaml
@@ -487,20 +500,7 @@ services:
     startCommand: python -m uvicorn main:app --host 0.0.0.0 --port $PORT
 ```
 
-### Frontend → Netlify (Free)
-
-1. Go to netlify.com
-2. Drag and drop your `frontend/` folder
-3. Done — live in 30 seconds
-
-### Switch to Redis Memory
-
-```env
-MEMORY_BACKEND=redis
-REDIS_HOST=your-redis-host
-REDIS_PORT=6379
-REDIS_PASSWORD=your-password
-```
+Frontend → Netlify (drag and drop `frontend/` folder)
 
 ---
 
@@ -509,15 +509,14 @@ REDIS_PASSWORD=your-password
 | Layer | Technology |
 |---|---|
 | Backend | FastAPI (Python 3.10–3.11) |
-| LLM Framework | LangChain |
-| LLM Provider | Google Gemini (free tier) |
-| Memory (demo) | In-memory Python dict |
-| Memory (prod) | Redis |
-| Frontend | Vanilla HTML / CSS / JavaScript |
-| Testing | pytest |
-| Logging | Loguru |
-| Server | Uvicorn / Gunicorn |
-| Deployment | Render + Netlify (both free) |
+| LLM | LangChain + Google Gemini |
+| RAG Vector DB | Pinecone (free) |
+| Embeddings | HuggingFace all-MiniLM-L6-v2 |
+| Database | MongoDB Atlas (free) |
+| Order Storage | Google Sheets (free) |
+| Email | Gmail SMTP (free) |
+| Frontend | HTML + CSS + JavaScript |
+| Deployment | Render + Netlify (free) |
 
 ---
 
@@ -525,17 +524,13 @@ REDIS_PASSWORD=your-password
 
 **Vishal Sahil** — AI Automation Engineer
 
-- 🌐 Portfolio: [vishalsahilai.vercel.app](https://vishalsahilai.vercel.app)
-- 💼 LinkedIn: [linkedin.com/in/vishal-sahil-ai](https://linkedin.com/in/vishal-sahil-ai)
-- 🐙 GitHub: [github.com/vishalsahilai](https://github.com/vishalsahilai)
-- 📧 Email: vishalsahilofficial@gmail.com
+- 🌐 [vishalsahilai.vercel.app](https://vishalsahilai.vercel.app)
+- 💼 [linkedin.com/in/vishal-sahil-ai](https://linkedin.com/in/vishal-sahil-ai)
+- 🐙 [github.com/vishalsahilai](https://github.com/vishalsahilai)
+- 📧 vishalsahilofficial@gmail.com
 
 ---
-
-## License
 
 MIT License — Free to use, modify, and distribute.
-
----
 
 > Built with ❤️ by Vishal Sahil · Powered by LangChain + Google Gemini
