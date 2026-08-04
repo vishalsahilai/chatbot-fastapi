@@ -9,3 +9,20 @@ PDF_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "Sadabahar_Rest
 # Chunk settings
 CHUNK_SIZE = 500        # characters per chunk
 CHUNK_OVERLAP = 100     # overlap between chunks for context continuity
+
+def load_and_split_pdf() -> list:
+    """
+    Load the restaurant PDF and split it into chunks.
+    
+    Returns:
+        list of Document object with text chunks.
+        
+    Raises:
+        FileNotFoundError If the PDF file does not exist.
+    """
+    if not os.path.exists(PDF_PATH):
+        raise FileNotFoundError(
+            f"PDF file not found at {PDF_PATH}\n"
+            f"Please place 'Sadabahar_Restaurant.pdf' in the 'data' directory."
+        )
+    logger.info(f"Loading PDF from: {PDF_PATH}")
