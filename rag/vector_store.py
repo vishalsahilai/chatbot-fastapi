@@ -70,3 +70,24 @@ def ingest_documents(chunks: list) -> None:
     )
 
     logger.info(f"Successfully ingested {len(chunks)} chunks into Pinecone.")
+
+def retrieve_context(query: str) -> str:
+    """Retrieves relevant context from Pinecone for a given query."""
+    try:
+        store = get_vector_store()
+        docs = store.similarity_search(query, k=6)
+
+        if not docs:
+            return ""
+
+        context_parts = []
+        for i, doc in enumerate(docs, 1):
+            context_parts.append(f"[Info {i}]\n{doc.page_content.strip()}")
+
+        context = "\n\n".join(context_parts)
+        logger.debug(f"Retrieved {len(docs)} chunks from Pinecone")
+        return context
+
+    except Exception as e:
+        logger.error(f"Pinecone retrieval failed: {e}")
+        return ""
