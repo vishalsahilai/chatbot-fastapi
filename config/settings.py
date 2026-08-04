@@ -17,16 +17,13 @@ class Settings(BaseSettings):
     llm_max_tokens: int = 512
 
     #App
-    #"development"	Running locally on your machine 
-    #"staging"	Testing before going live
-    #"production"	Live app for real users
     app_env: str = "development"
     app_host: str = "0.0.0.0"
     app_port: int = 8000
     debug: bool = True
 
     #Memory
-    memory_backend: str = "redis"      # "dict" | "redis" | "both"
+    memory_backend: str = "dict"      # "dict" | "redis" | "both"
     max_summaries: int = 5
 
     # Redis 
@@ -43,8 +40,10 @@ class Settings(BaseSettings):
         "http://127.0.0.1:3000",
         "http://localhost:5500",
         "http://127.0.0.1:5500",
-        ]
-
+    ]
+    # Pinecone
+    pinecone_api_key: str = ""
+    Pinecone_index_name: str = "sadabahar-restaurant"
 
 # Singleton instance used across the app
 settings = Settings()
