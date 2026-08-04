@@ -24,3 +24,21 @@ def _build_email_body(order: dict) -> str:
     <p>Thank you for ordering from Sadabahar Restaurant!</p>
     </body></html>
     """
+
+async def send_confirmation_email(order: dict):
+    if not order.get("email"):
+        logger.warning("No email provided — skipping confirmation.")
+        return
+ 
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = f"Order Confirmed — Sadabahar Restaurant 🍕 ({order['order_id']})"
+    msg["From"] = settings.email_from
+    msg["To"] = order["email"]
+    msg.attach(MIMEText(_build_email_body(order), "html"))
+ 
+    with smtplib.SMTP(settings.email_host, settings.email_port) as server:
+        server.starttls()
+        server.login(settings.email_username, settings.email_password)
+        server.sendmail(settings.email_from, order["email"], msg.as_string())
+ 
+    logger.info(f"Confirmation email sent to {order['email']}")
