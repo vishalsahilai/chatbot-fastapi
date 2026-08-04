@@ -30,6 +30,6 @@ async def health() -> HealthResponse:
         service="Sadabahar Restaurant Chatbot",
         version="1.0.0",
         environment=settings.app_env,
-        memory_backend=settings.memory_backend,
+        memory_backend="MongoDB",
         timestamp=datetime.now(timezone.utc).isoformat(),
     )
