@@ -22,3 +22,11 @@ def update_last_seen(phone: str):
         {"phone": phone},
         {"$set": {"last_seen": datetime.now(timezone.utc).isocalendar()}}
     )
+
+def update_last_order(phone: str, order: dict):
+    customers_col().update_one(
+        {"phone": phone},
+        {"$set": {"last_order": order, "last_seen": datetime.now(timezone.utc).isoformat()}}
+    )
+    logger.debug(f"Last order updated for {phone}")
+
