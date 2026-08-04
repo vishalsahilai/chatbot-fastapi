@@ -43,7 +43,7 @@ class Settings(BaseSettings):
     ]
     # Pinecone
     pinecone_api_key: str = ""
-    Pinecone_index_name: str = "sadabahar-restaurant"
+    pinecone_index_name: str = "sadabahar-restaurant"
 
 # Singleton instance used across the app
 settings = Settings()
