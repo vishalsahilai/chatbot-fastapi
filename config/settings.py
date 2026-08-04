@@ -40,6 +40,8 @@ class Settings(BaseSettings):
     app_port: int = 8000
     debug: bool = True
 
+    # Session
+    session_timeout_hours: int = 2
 
     #CORS 
     cors_origins: List[str] = [
