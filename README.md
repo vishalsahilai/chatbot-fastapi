@@ -103,50 +103,51 @@
 ```
 sadabahar-restaurant-chatbot/
 │
-├── main.py
-├── requirements.txt
-├── render.yaml
-├── .env.example
-├── .gitignore
+├── database/
+│   ├── __init__.py                    ← Database __init__
+│   ├── mongodb.py                     ← MongoDB connection and client
+│   └── models.py                      ← MongoDB collection helpers
 │
-├── routes/
-│   ├── chat.py
-│   ├── health.py
-│   └── order.py
+├── config/
+│   ├── __init__.py
+│   └── settings.py                    ← Updated settings with MongoDB and session timeout
 │
 ├── services/
+│   ├── __init__.py
 │   ├── chat_service.py
 │   ├── llm_service.py
-│   ├── customer_service.py
-│   ├── order_service.py
-│   ├── sheets_service.py
-│   └── email_service.py
+│   ├── customer_service.py            ← Customer service - phone-based permanent recognition
+│   ├── order_service.py               ← Order service - saves to MongoDB, Sheets, email
+│   ├── sheets_service.py              ← Google Sheets service
+│   └── email_service.py               ← Email confirmation service
+│
+├── memory/
+│   ├── __init__.py
+│   ├── memory_manager.py              ← Updated - MongoDB + unlimited summaries + 2hr expiry
+│   ├── summarizer.py
+│   └── context_builder.py             ← Updated - unlimited summaries
+│
+├── prompts/
+│   └── system_prompt.py               ← Updated - customer name injection + reorder logic
 │
 ├── rag/
+│   ├── __init__.py
 │   ├── rag_service.py
 │   ├── vector_store.py
 │   ├── document_loader.py
 │   └── embeddings.py
 │
-├── memory/
-│   ├── memory_manager.py
-│   ├── summarizer.py
-│   └── context_builder.py
-│
-├── database/
-│   ├── mongodb.py
-│   └── models.py
+├── routes/
+│   ├── __init__.py
+│   ├── chat.py
+│   ├── health.py
+│   └── order.py                       ← New order endpoint
 │
 ├── utils/
+│   ├── __init__.py
 │   ├── validators.py
 │   ├── logger.py
 │   └── menu.py
-│
-├── config/
-│   └── settings.py
-│
-├── prompts/
-│   └── system_prompt.py
 │
 ├── data/
 │   └── Sadabahar_Restaurant.pdf
@@ -159,11 +160,18 @@ sadabahar-restaurant-chatbot/
 │   ├── style.css
 │   └── app.js
 │
-└── tests/
-    ├── test_chat.py
-    ├── test_memory.py
-    └── test_rag.py
-```
+├── tests/
+│   ├── __init__.py
+│   ├── test_chat.py
+│   ├── test_memory.py
+│   └── test_rag.py
+│
+├── main.py
+├── requirements.txt
+├── render.yaml
+├── .env
+├── .env.example
+└── .gitignore
 
 ---
 
