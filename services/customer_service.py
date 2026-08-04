@@ -16,3 +16,9 @@ def create_customer(phone: str, name: str) -> dict:
     customers_col().insert_one({**customer})
     logger.info(f"New customer created: {name} ({phone})")
     return customer
+
+def update_last_seen(phone: str):
+    customers_col().update_one(
+        {"phone": phone},
+        {"$set": {"last_seen": datetime.now(timezone.utc).isocalendar()}}
+    )
