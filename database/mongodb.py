@@ -13,3 +13,11 @@ def get_db() -> Database:
         _db = _client["sadabahar"]
         logger.info("Connected to MongoDB")
     return _db
+
+def close_db():
+    global _client, _db
+    if _client:
+        _client.close()
+        _client = None
+        _db = None
+        logger.info("MongoDB disconnected.")
