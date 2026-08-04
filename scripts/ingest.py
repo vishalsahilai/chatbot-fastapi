@@ -25,3 +25,35 @@ def save_chunks_locally(chunks):
         json.dump(output, f, indent=2, ensure_ascii=False)
     
     print(f" Saved {len(chunks)} chunks to data/chunks_preview.json")
+
+def main():
+    logger.info("=" * 50)
+    logger.info("Sadabahar Restaurant — PDF Ingestion")
+    logger.info("=" * 50)
+
+    try:
+        # Step 1: Load and chunk PDF
+        logger.info("Step 1: Loading and chunking PDF...")
+        chunks = load_and_split_pdf()
+        logger.info(f"✅ PDF loaded — {len(chunks)} chunks created.")
+
+        # Save chunks locally ← ADD THIS
+        save_chunks_locally(chunks)
+
+        # Step 2: Ingest into ChromaDB
+        logger.info("Step 2: Ingesting into ChromaDB...")
+        ingest_documents(chunks)
+        logger.info("✅ ChromaDB populated successfully.")
+
+        logger.info("=" * 50)
+        logger.info("✅ Ingestion complete! RAG system is ready.")
+        logger.info("You can now run: python -m uvicorn main:app --reload")
+        logger.info("=" * 50)
+
+    except FileNotFoundError as e:
+        logger.error(f"❌ {e}")
+        sys.exit(1)
+    except Exception as e:
+        logger.error(f"❌ Ingestion failed: {e}")
+        sys.exit(1)
+
