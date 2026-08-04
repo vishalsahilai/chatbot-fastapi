@@ -23,3 +23,14 @@ async def process_order(order_data: dict) -> dict:
         "status": "confirmed",
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
+
+    orders_col().insert_one({**order})
+    logger.info(f"Order saved to MongoDB: {order_id}")
+ 
+    last_order_summary = {
+        "order_id": order_id,
+        "items": order_data["items"],
+        "total": order_data["total"],
+        "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+    }
+    update_last_order(order_data["phone"], last_order_summary)
