@@ -34,3 +34,20 @@ async def process_order(order_data: dict) -> dict:
         "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
     }
     update_last_order(order_data["phone"], last_order_summary)
+
+    try:
+        save_order_to_sheets(order)
+    except Exception as e:
+        logger.warning(f"Google Sheets save failed: {e}")
+
+    try:
+        await send_confirmation_email(order)
+    except Exception as e:
+        logger.warning(f"Email send Failed: {e}")
+
+    return{
+        "order_id": order_id,
+        "status": "confirmed",
+        "message": f"Order placed! Confirmation sent to {order.get('email', 'your email')}",
+        "estimated_time": "30-45 minutes",     
+    }
