@@ -12,11 +12,11 @@ def get_embeddings() -> HuggingFaceEmbeddings:
     """
     global _embeddings
     if _embeddings is None:
-        logger.info(f"Loading embeddings model: {EMBEDDING_MODEL}")
+        logger.info(f"Loading embedding model: {EMBEDDING_MODEL}")
         _embeddings = HuggingFaceEmbeddings(
             model_name=EMBEDDING_MODEL,
-            model_kwargs={"device": "cpu"}  # Change to "cuda" if GPU is available
-            encode_kwargs={"normalize_embeddings": True}
-            )
+            model_kwargs={"device": "cpu"},
+            encode_kwargs={"normalize_embeddings": True},
+        )
         logger.info("Embedding model loaded successfully.")
     return _embeddings
