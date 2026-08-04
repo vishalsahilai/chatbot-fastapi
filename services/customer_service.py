@@ -4,3 +4,15 @@ from utils.logger import logger
 
 def get_customer(phone: str) -> dict | None:
     return customers_col().find_one({"phone": phone}, {'_id':0})
+
+def create_customer(phone: str, name: str) -> dict:
+    customer = {
+        "phone": phone,
+        "name": name,
+        "first_seen": datetime.now(timezone.utc).isoformat(),
+        "last_seen": datetime.now(timezone.utc).isoformat(),
+        "last_order": None,
+    }
+    customers_col().insert_one({**customer})
+    logger.info(f"New customer created: {name} ({phone})")
+    return customer
