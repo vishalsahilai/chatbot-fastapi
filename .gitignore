@@ -29,3 +29,7 @@ htmlcov/
 # OS
 .DS_Store
 Thumbs.db
+
+# Local chunk preview files
+data/chunks_preview.json
+data/*.json
