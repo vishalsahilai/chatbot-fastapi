@@ -30,3 +30,9 @@ def update_last_order(phone: str, order: dict):
     )
     logger.debug(f"Last order updated for {phone}")
 
+def get_or_create_customer(phone: str, name: str) -> dict:
+    customer = get_customer(phone)
+    if customer:
+        update_last_seen(phone)
+        return customer
+    return create_customer(phone, name)
