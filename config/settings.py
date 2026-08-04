@@ -25,6 +25,14 @@ class Settings(BaseSettings):
     # MongoDB
     mongodb_uri: str = "mongodb://localhost:27017"
 
+    # Pinecone
+    pinecone_api_key: str = ""
+    pinecone_index_name: str = "sadabahar-restaurant"
+
+    # Google Sheets
+    google_sheets_id: str = ""
+    google_service_account_json: str = ""
+
 
     #CORS 
     cors_origins: List[str] = [
@@ -33,9 +41,7 @@ class Settings(BaseSettings):
         "http://localhost:5500",
         "http://127.0.0.1:5500",
     ]
-    # Pinecone
-    pinecone_api_key: str = ""
-    pinecone_index_name: str = "sadabahar-restaurant"
+
 
 # Singleton instance used across the app
 settings = Settings()
