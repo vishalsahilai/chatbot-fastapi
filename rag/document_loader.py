@@ -26,3 +26,8 @@ def load_and_split_pdf() -> list:
             f"Please place 'Sadabahar_Restaurant.pdf' in the 'data' directory."
         )
     logger.info(f"Loading PDF from: {PDF_PATH}")
+
+#load PDF
+    loader = PyPDFLoader(PDF_PATH)
+    pages = loader.load()
+    logger.info(f"PDF Loaded {len(pages)} pages found.")
