@@ -16,12 +16,6 @@ class Settings(BaseSettings):
     llm_temperature: float = 0.7
     llm_max_tokens: int = 512
 
-    #App
-    app_env: str = "development"
-    app_host: str = "0.0.0.0"
-    app_port: int = 8000
-    debug: bool = True
-
     # MongoDB
     mongodb_uri: str = "mongodb://localhost:27017"
 
@@ -32,6 +26,19 @@ class Settings(BaseSettings):
     # Google Sheets
     google_sheets_id: str = ""
     google_service_account_json: str = ""
+
+    # Email
+    email_host: str = "smtp.gmail.com"
+    email_port: int = 587
+    email_username: str = ""
+    email_password: str = ""
+    email_from: str = ""
+
+    #App
+    app_env: str = "development"
+    app_host: str = "0.0.0.0"
+    app_port: int = 8000
+    debug: bool = True
 
 
     #CORS 
