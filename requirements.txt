@@ -1,49 +1,50 @@
-# Python 3.11
-# Install: pip install -r requirements.txt
-
-# 1. Web Framework
+# Web Framework
 fastapi[standard]
 uvicorn[standard]
 gunicorn
 
-# 2. Request / Response Handling
+# Request / Response
 pydantic
 pydantic-settings
 python-multipart
 httpx
 
-# 3. LangChain — LLM Framework
+# LangChain + Gemini
 langchain
 langchain-core
 langchain-google-genai
 langchain-community
 google-generativeai
 
-# 4. RAG — Vector Store & Embeddings
-pinecone==3.2.2
+# RAG
+pinecone
 langchain-pinecone
 sentence-transformers
 pypdf
 
-# 5. Memory & Storage
-redis
+# Database
+pymongo
+motor
 
-# 6. Environment & Configuration
+# Google Sheets (Cloud API)
+gspread
+google-auth
+google-auth-oauthlib
+
+# Email
+secure-smtplib
+
+# Environment
 python-dotenv
 
-# 7. Logging & Monitoring
+# Logging
 loguru
 
-# 8. Utilities
+# Utilities
 tenacity
 python-dateutil
 
-# 9. Testing
+# Testing
 pytest
 pytest-asyncio
 pytest-cov
-
-# 10. Dev / Code Quality
-black
-isort
-flake8
