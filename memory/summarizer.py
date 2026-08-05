@@ -1,17 +1,10 @@
 """
 Sadabahar Restaurant Chatbot — Conversation Summarizer
-
-Calls the LLM to generate a structured summary of a single user↔bot exchange.
-Each summary captures:
-  - user_intent  : what the user was trying to accomplish
-  - bot_response : what the bot said (condensed)
-  - context      : any important context for future turns
 """
 
 import json
 from tenacity import retry, stop_after_attempt, wait_exponential
 
-from config.settings import settings
 from utils.logger import logger
 
 
@@ -30,7 +23,7 @@ async def summarize_conversation(
     Args:
         user_message : The user's message in this turn.
         bot_response : The bot's response in this turn.
-        llm_chain    : The LangChain LLM chain instance.
+        llm_chain    : The LangChain LLM instance.
 
     Returns:
         {
@@ -64,7 +57,8 @@ Example format:
 """.strip()
 
     try:
-        raw = await llm_chain.ainvoke({"input": summarization_prompt})
+        # Fixed — pass string directly not dict
+        raw = await llm_chain.ainvoke(summarization_prompt)
         raw_text = raw.content if hasattr(raw, "content") else str(raw)
 
         # Strip markdown fences if present
@@ -91,10 +85,7 @@ Example format:
 
 
 def _fallback_summary(user_message: str, bot_response: str) -> dict:
-    """
-    Basic fallback summary used when the LLM summarizer fails.
-    Truncates long strings to keep context lean.
-    """
+    """Basic fallback summary when LLM summarizer fails."""
     return {
         "user_intent": user_message[:150],
         "bot_response": bot_response[:150],
