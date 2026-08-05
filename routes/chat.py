@@ -11,6 +11,7 @@ router = APIRouter()
 class ChatRequest(BaseModel):
     session_id: str
     message: str
+    phone: str = ""
  
     model_config = {
         "json_schema_extra": {
@@ -51,6 +52,6 @@ async def chat(request: ChatRequest) -> ChatResponse:
     logger.info(f"POST /chat — session={session_id}")
 
     # Delegate to chat service
-    result = await process_chat(session_id=session_id, user_message=message)
+    result = await process_chat(session_id=session_id, user_message=message, phone=request.phone)
  
     return ChatResponse(**result)
