@@ -25,4 +25,10 @@ class OrderResponse(BaseModel):
     status: str
     message: str
     estimated_time: str
-    
+
+@router.post("/order", response_model=OrderResponse, tags=["Order"])
+async def place_order(request: OrderResponse) -> OrderResponse:
+    order_data = request.model_dump()
+    order_data["items"] = [item.model_dump() for item in request.items]
+    result = await process_order(order_data)
+    return OrderResponse(**result)
