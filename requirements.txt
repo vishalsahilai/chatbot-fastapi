@@ -48,3 +48,5 @@ python-dateutil
 pytest
 pytest-asyncio
 pytest-cov
+
+certifi

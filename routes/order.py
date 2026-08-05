@@ -15,7 +15,7 @@ class OrderRequest(BaseModel):
     session_id: str
     phone: str
     name: str
-    eamil: str = ""
+    email: str = ""
     address: str
     items: list[OrderItem]
     total: float
@@ -27,7 +27,7 @@ class OrderResponse(BaseModel):
     estimated_time: str
 
 @router.post("/order", response_model=OrderResponse, tags=["Order"])
-async def place_order(request: OrderResponse) -> OrderResponse:
+async def place_order(request: OrderRequest) -> OrderResponse:
     order_data = request.model_dump()
     order_data["items"] = [item.model_dump() for item in request.items]
     result = await process_order(order_data)

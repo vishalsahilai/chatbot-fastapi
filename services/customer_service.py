@@ -20,7 +20,7 @@ def create_customer(phone: str, name: str) -> dict:
 def update_last_seen(phone: str):
     customers_col().update_one(
         {"phone": phone},
-        {"$set": {"last_seen": datetime.now(timezone.utc).isocalendar()}}
+        {"$set": {"last_seen": datetime.now(timezone.utc).isoformat()}}
     )
 
 def update_last_order(phone: str, order: dict):
