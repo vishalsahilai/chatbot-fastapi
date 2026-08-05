@@ -9,10 +9,35 @@ from services.llm_service import safe_invoke_llm, get_summarizer_llm
 from services.customer_service import get_customer, get_or_create_customer
 from rag.rag_service import get_rag_context
 from prompts.system_prompt import build_system_prompt
+from utils.menu import is_menu_request, get_formatted_menu
 from utils.logger import logger
 
 
 async def process_chat(session_id: str, user_message: str, phone: str = "") -> dict:
+
+
+    # Menu shortcut - Skip RAG and LLM completely
+
+    if is_menu_request(user_message):
+        menu_response = (
+            f"Here's our complete menu! 🍽️\n\n"
+            f"{get_formatted_menu()}"
+        )
+
+        session = get_session(session_id, phone=phone)
+        session = increment_message_count(session)
+        session = set_last_messages(session, user_message, menu_response)
+        save_session(session_id, session)
+
+        return {
+            "session_id": session_id,
+            "response": menu_response,
+            "message_count": session["message_count"],
+        }
+
+
+    # Normal chatbot flow
+
     # Load customer if phone provided
     customer = None
     customer_name = ""
@@ -31,9 +56,11 @@ async def process_chat(session_id: str, user_message: str, phone: str = "") -> d
     if not customer_name:
         customer_name = session.get("name", "")
 
-    logger.info(f"[{session_id}] Message #{session['message_count'] + 1}: '{user_message[:60]}'")
+    logger.info(
+        f"[{session_id}] Message #{session['message_count'] + 1}: '{user_message[:60]}'"
+    )
 
-    # Build dynamic system prompt with customer context
+    # Build dynamic system prompt
     system_prompt = build_system_prompt(
         customer_name=customer_name,
         last_order=last_order if session["message_count"] == 0 else None,
@@ -45,15 +72,25 @@ async def process_chat(session_id: str, user_message: str, phone: str = "") -> d
     # Build memory context
     memory_context = get_context_for_llm(session, user_message)
 
-    # Combine all context
-    full_context = f"{rag_context}\n\n{memory_context}" if rag_context else memory_context
+    # Combine contexts
+    full_context = (
+        f"{rag_context}\n\n{memory_context}"
+        if rag_context
+        else memory_context
+    )
 
     # Invoke LLM
     try:
-        bot_response = await safe_invoke_llm(full_context, system_prompt=system_prompt)
+        bot_response = await safe_invoke_llm(
+            full_context,
+            system_prompt=system_prompt,
+        )
     except Exception as e:
         logger.error(f"[{session_id}] LLM failure: {e}")
-        raise HTTPException(status_code=503, detail="LLM service is temporarily unavailable.")
+        raise HTTPException(
+            status_code=503,
+            detail="LLM service is temporarily unavailable.",
+        )
 
     # Update memory
     session = increment_message_count(session)
@@ -67,11 +104,17 @@ async def process_chat(session_id: str, user_message: str, phone: str = "") -> d
             )
             session = append_summary(session, summary)
         except Exception as e:
-            logger.warning(f"[{session_id}] Summarization skipped: {e}")
+            logger.warning(
+                f"[{session_id}] Summarization skipped: {e}"
+            )
 
-    session = set_last_messages(session, user_message, bot_response)
+    session = set_last_messages(
+        session,
+        user_message,
+        bot_response,
+    )
 
-    # Store name in session if found in customer
+    # Store customer name in session
     if customer_name and not session.get("name"):
         session["name"] = customer_name
 
