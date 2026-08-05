@@ -10,3 +10,13 @@ class OrderItem(BaseModel):
     size: str = ""
     qty: int
     price: float
+
+class OrderRequest(BaseModel):
+    session_id: str
+    phone: str
+    name: str
+    eamil: str = ""
+    address: str
+    items: list[OrderItem]
+    total: float
+    
