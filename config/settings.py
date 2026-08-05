@@ -6,12 +6,14 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8", #Read the .env file using UTF-8 encoding/ UTF-8 supports all characters including special symbols, emojis, other languages
         case_sensitive=False,
+        extra="ignore",
     )
 
     # (Gemini) 
     google_api_key_1: str = ""
     google_api_key_2: str = ""
     google_api_key_3: str = ""
+    google_api_key_4: str = ""
     gemini_model: str = "gemini-2.5-flash"
     llm_temperature: float = 0.7
     llm_max_tokens: int = 512
