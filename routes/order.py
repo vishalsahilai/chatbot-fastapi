@@ -19,4 +19,10 @@ class OrderRequest(BaseModel):
     address: str
     items: list[OrderItem]
     total: float
+
+class OrderResponse(BaseModel):
+    order_id: str
+    status: str
+    message: str
+    estimated_time: str
     
