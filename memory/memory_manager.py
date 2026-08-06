@@ -14,8 +14,7 @@ def _is_expired(session: dict) -> bool:
         return False
     if isinstance(last_active, str):
         last_active = datetime.fromisoformat(last_active)
-    timeout = timedelta(hours=settings.session_timeout_hours)
-    return _now() - last_active > timeout
+    return _now() - last_active > timedelta(hours=settings.session_timeout_hours)
 
 
 def _empty_session(session_id: str, phone: str = "", name: str = "") -> dict:
@@ -29,6 +28,15 @@ def _empty_session(session_id: str, phone: str = "", name: str = "") -> dict:
         "created_at": _now().isoformat(),
         "last_active": _now().isoformat(),
         "is_expired": False,
+        "order_state": {
+            "collecting": False,
+            "name": "",
+            "phone": "",
+            "email": "",
+            "address": "",
+            "items": [],
+            "total": 0,
+        },
     }
 
 
@@ -47,16 +55,15 @@ def get_session(session_id: str, phone: str = "", name: str = "") -> dict:
         sessions_col().replace_one({"session_id": session_id}, {**session})
         return session
 
+    if "order_state" not in doc:
+        doc["order_state"] = _empty_session(session_id)["order_state"]
+
     return doc
 
 
 def save_session(session_id: str, session: dict):
     session["last_active"] = _now().isoformat()
-    sessions_col().replace_one(
-        {"session_id": session_id},
-        {**session},
-        upsert=True
-    )
+    sessions_col().replace_one({"session_id": session_id}, {**session}, upsert=True)
     logger.debug(f"[{session_id}] Session saved.")
 
 
@@ -75,6 +82,24 @@ def set_last_messages(session: dict, user_msg: str, bot_response: str) -> dict:
         {"role": "user", "content": user_msg},
         {"role": "assistant", "content": bot_response},
     ]
+    return session
+
+
+def update_order_state(session: dict, updates: dict) -> dict:
+    session["order_state"].update(updates)
+    return session
+
+
+def reset_order_state(session: dict) -> dict:
+    session["order_state"] = {
+        "collecting": False,
+        "name": "",
+        "phone": "",
+        "email": "",
+        "address": "",
+        "items": [],
+        "total": 0,
+    }
     return session
 
 
