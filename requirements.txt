@@ -33,6 +33,7 @@ google-auth-oauthlib
 
 # Email
 secure-smtplib
+resend
 
 # Environment
 python-dotenv
