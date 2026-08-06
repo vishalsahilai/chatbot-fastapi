@@ -38,7 +38,13 @@ Example format:
 
     try:
         raw = await llm_chain.ainvoke(summarization_prompt)
-        raw_text = raw.content if hasattr(raw, "content") else str(raw)
+        if isinstance(raw.content, list):
+            raw_text = " ".join(
+                block.get("text", "") if isinstance(block, dict) else str(block)
+                for block in raw.content
+            )
+        else:
+            raw_text = raw.content if hasattr(raw, "content") else str(raw)
 
         clean = raw_text.strip()
         if clean.startswith("```"):
