@@ -29,12 +29,8 @@ class Settings(BaseSettings):
     google_sheets_id: str = ""
     google_service_account_json: str = ""
 
-    # Email
-    email_host: str = "smtp.gmail.com"
-    email_port: int = 587
-    email_username: str = ""
-    email_password: str = ""
-    email_from: str = ""
+    # Email (Resend)
+    resend_api_key: str = ""
 
     #App
     app_env: str = "development"
