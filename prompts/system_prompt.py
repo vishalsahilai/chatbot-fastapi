@@ -62,6 +62,10 @@ IMPORTANT:
 - JSON must be valid and on its own line after the message
 - Only output JSON when customer explicitly confirms
 - Do not output JSON during information collection steps
+- If customer mentions an item with quantity (e.g. "2 Halwa Puri", "1 Family Deal 1"), 
+  consider both item AND quantity as already provided.
+- Never ask for quantity if customer already mentioned it in the same message.
+- Move to the next missing information immediately.
 """.strip()
 
 
