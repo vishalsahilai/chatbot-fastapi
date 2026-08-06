@@ -1,10 +1,6 @@
-"""
-Sadabahar Restaurant Chatbot — Conversation Summarizer
-"""
-
 import json
+import re
 from tenacity import retry, stop_after_attempt, wait_exponential
-
 from utils.logger import logger
 
 
@@ -17,35 +13,19 @@ async def summarize_conversation(
     bot_response: str,
     llm_chain,
 ) -> dict:
-    """
-    Summarizes a single conversation turn into a structured dict.
+    bot_response_clean = re.sub(r'\{.*?"order_ready".*?\}', '', bot_response, flags=re.DOTALL).strip()
 
-    Args:
-        user_message : The user's message in this turn.
-        bot_response : The bot's response in this turn.
-        llm_chain    : The LangChain LLM instance.
-
-    Returns:
-        {
-            "user_intent": str,
-            "bot_response": str,
-            "context": str
-        }
-
-    Falls back to a basic summary if LLM call or JSON parsing fails.
-    """
     summarization_prompt = f"""
 You are a conversation summarizer for a restaurant chatbot system.
 
 Summarize the following exchange in strict JSON format with exactly these three keys:
 - "user_intent"  : A brief description of what the user wanted or asked (1 sentence).
 - "bot_response" : A brief summary of what the bot replied (1-2 sentences).
-- "context"      : Any useful context that should be remembered for future turns
-                   (e.g., user preferences, items they liked, delivery area, etc.).
+- "context"      : Any useful context that should be remembered for future turns.
 
 Exchange to summarize:
 USER: {user_message}
-BOT: {bot_response}
+BOT: {bot_response_clean}
 
 Respond ONLY with valid JSON. No preamble, no markdown, no explanation.
 Example format:
@@ -57,11 +37,9 @@ Example format:
 """.strip()
 
     try:
-        # Fixed — pass string directly not dict
         raw = await llm_chain.ainvoke(summarization_prompt)
         raw_text = raw.content if hasattr(raw, "content") else str(raw)
 
-        # Strip markdown fences if present
         clean = raw_text.strip()
         if clean.startswith("```"):
             clean = clean.split("```")[1]
@@ -71,7 +49,6 @@ Example format:
 
         summary = json.loads(clean)
 
-        # Validate expected keys
         required_keys = {"user_intent", "bot_response", "context"}
         if not required_keys.issubset(summary.keys()):
             raise ValueError(f"Summary missing keys: {required_keys - summary.keys()}")
@@ -81,11 +58,10 @@ Example format:
 
     except Exception as e:
         logger.warning(f"Summarization failed ({e}), using fallback summary.")
-        return _fallback_summary(user_message, bot_response)
+        return _fallback_summary(user_message, bot_response_clean)
 
 
 def _fallback_summary(user_message: str, bot_response: str) -> dict:
-    """Basic fallback summary when LLM summarizer fails."""
     return {
         "user_intent": user_message[:150],
         "bot_response": bot_response[:150],
