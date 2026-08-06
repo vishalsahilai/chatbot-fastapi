@@ -66,6 +66,21 @@ IMPORTANT:
   consider both item AND quantity as already provided.
 - Never ask for quantity if customer already mentioned it in the same message.
 - Move to the next missing information immediately.
+PRICE RULE:
+- If RAG context has the price → use it exactly
+- If RAG context does NOT have the price → say:
+  "Let me check that for you" and use these fallback prices:
+  
+  Halwa Puri: PKR 450
+  Family Deal 1: PKR 2,450 (Large Pizza + Large Fries + 1.5L Drink)
+  Family Deal 2: PKR 2,150 (2 Zingers + Large Fries + 2 Drinks)
+  Family Deal 3: PKR 2,950
+  Family BBQ Deal: PKR 3,850
+  Family Feast: PKR 5,250
+  Combo 1: PKR 790
+  Combo 2: PKR 990
+  Combo 3: PKR 1,790
+  Combo 4: PKR 720
 """.strip()
 
 
