@@ -41,10 +41,10 @@ async def global_exception_handler(request, exc):
 #startup Event
 @app.on_event("startup")
 async def on_startup():
-    logger.info("Sadabahar Restaurant Chatbot starting up...")
-    logger.info(f"Environment: {settings.app_env}")
     get_db()
-    logger.info("MongoDB connected.")
+    from rag.embeddings import get_embeddings
+    get_embeddings()  # loads model once at startup
+    logger.info("All services ready.")
 
 #shutdown Event
 @app.on_event("shutdown")

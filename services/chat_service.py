@@ -60,6 +60,19 @@ async def process_chat(session_id: str, user_message: str, phone: str = "") -> d
             "message_count": session["message_count"],
         }
 
+    import re
+
+    SKIP_RAG_PATTERNS = [
+        r"^\d{10,15}$",                    # phone numbers
+        r"^[^@\s]+@[^@\s]+\.[^@\s]+$",   # emails
+        r"^(yes|no|ok|okay|confirm|done|nothing|else|thanks|sure|yep|nope|hi|hello|salam)$",
+        r"^[\w\s,.-]{3,50}$",             # short addresses
+    ]
+
+    def _should_skip_rag(message: str) -> bool:
+        msg = message.lower().strip()
+        return any(re.match(p, msg, re.IGNORECASE) for p in SKIP_RAG_PATTERNS)
+
     # ── Load customer ─────────────────────────────────────────────
     customer_name = ""
     last_order = None
@@ -85,7 +98,7 @@ async def process_chat(session_id: str, user_message: str, phone: str = "") -> d
     )
 
     #  Get RAG context 
-    rag_context = get_rag_context(user_message)
+    rag_context = "" if _should_skip_rag(user_message) else get_rag_context(user_message)
 
     #  Build memory context 
     memory_context = get_context_for_llm(session, user_message)
