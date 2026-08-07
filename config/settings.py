@@ -30,7 +30,14 @@ class Settings(BaseSettings):
     google_service_account_json: str = ""
 
     # Email (Resend)
-    resend_api_key: str = ""
+    # brevo_api_key: str = ""
+    # email_from: str = ""
+    # Email
+    email_host: str = ""
+    email_port: int =""
+    email_username: str = ""
+    email_password: str = ""
+    email_from: str = ""
 
     #App
     app_env: str = "development"

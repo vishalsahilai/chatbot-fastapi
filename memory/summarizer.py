@@ -3,6 +3,13 @@ import re
 from tenacity import retry, stop_after_attempt, wait_exponential
 from utils.logger import logger
 
+def _fallback_summary(user_message: str, bot_response: str) -> dict:
+    return {
+        "user_intent": user_message[:150],
+        "bot_response": bot_response[:150],
+        "context": "Summary auto-generated due to LLM failure.",
+    }
+
 
 @retry(
     stop=stop_after_attempt(3),
@@ -38,6 +45,7 @@ Example format:
 
     try:
         raw = await llm_chain.ainvoke(summarization_prompt)
+
         if isinstance(raw.content, list):
             raw_text = " ".join(
                 block.get("text", "") if isinstance(block, dict) else str(block)
@@ -47,11 +55,23 @@ Example format:
             raw_text = raw.content if hasattr(raw, "content") else str(raw)
 
         clean = raw_text.strip()
+
+        # Strip markdown fences
         if clean.startswith("```"):
             clean = clean.split("```")[1]
             if clean.startswith("json"):
                 clean = clean[4:]
         clean = clean.strip()
+
+        # Find JSON block only
+        start = clean.find("{")
+        end = clean.rfind("}") + 1
+        if start != -1 and end > start:
+            clean = clean[start:end]
+
+        # Fix common JSON issues — replace smart quotes
+        clean = clean.replace('"', '"').replace('"', '"')
+        clean = clean.replace("'", "'").replace("'", "'")
 
         summary = json.loads(clean)
 
@@ -65,11 +85,3 @@ Example format:
     except Exception as e:
         logger.warning(f"Summarization failed ({e}), using fallback summary.")
         return _fallback_summary(user_message, bot_response_clean)
-
-
-def _fallback_summary(user_message: str, bot_response: str) -> dict:
-    return {
-        "user_intent": user_message[:150],
-        "bot_response": bot_response[:150],
-        "context": "Summary auto-generated due to LLM failure.",
-    }

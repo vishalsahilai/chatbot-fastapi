@@ -9,7 +9,6 @@
 ![Sadabahar Restaurant Chatbot UI](./docs/sadabahar-restaurant-demo.png)
 
 > **Try it live:** [sadabahar-restaurant-bot.vercel.app](https://sadabahar-restaurant-bot.vercel.app)
-> **GitHub:** [github.com/vishalsahilai/sadabahar-restaurant-chatbot](https://github.com/vishalsahilai/sadabahar-restaurant-chatbot)
 
 ---
 
