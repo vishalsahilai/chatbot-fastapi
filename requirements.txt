@@ -34,7 +34,6 @@ google-auth-oauthlib
 # Email
 secure-smtplib
 
-
 # Environment
 python-dotenv
 
@@ -49,5 +48,3 @@ python-dateutil
 pytest
 pytest-asyncio
 pytest-cov
-
-certifi

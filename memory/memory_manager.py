@@ -14,6 +14,9 @@ def _is_expired(session: dict) -> bool:
         return False
     if isinstance(last_active, str):
         last_active = datetime.fromisoformat(last_active)
+    # Fix timezone naive issue
+    if last_active.tzinfo is None:
+        last_active = last_active.replace(tzinfo=timezone.utc)
     return _now() - last_active > timedelta(hours=settings.session_timeout_hours)
 
 
@@ -45,14 +48,14 @@ def get_session(session_id: str, phone: str = "", name: str = "") -> dict:
 
     if not doc:
         session = _empty_session(session_id, phone, name)
-        sessions_col().insert_one({**session})
+        sessions_col().insert_one(session.copy())  # use copy
         logger.debug(f"[{session_id}] New session created.")
         return session
 
     if _is_expired(doc):
         logger.info(f"[{session_id}] Session expired — resetting.")
         session = _empty_session(session_id, doc.get("phone", phone), doc.get("name", name))
-        sessions_col().replace_one({"session_id": session_id}, {**session})
+        sessions_col().replace_one({"session_id": session_id}, session.copy())  # ✅ use copy
         return session
 
     if "order_state" not in doc:
@@ -63,7 +66,11 @@ def get_session(session_id: str, phone: str = "", name: str = "") -> dict:
 
 def save_session(session_id: str, session: dict):
     session["last_active"] = _now().isoformat()
-    sessions_col().replace_one({"session_id": session_id}, {**session}, upsert=True)
+    sessions_col().replace_one(
+        {"session_id": session_id},
+        session.copy(),  # use copy
+        upsert=True
+    )
     logger.debug(f"[{session_id}] Session saved.")
 
 
@@ -74,7 +81,7 @@ def increment_message_count(session: dict) -> dict:
 
 def append_summary(session: dict, summary: dict) -> dict:
     session["summaries"].append(summary)
-    return session
+    return session  #  No limit — unlimited summaries
 
 
 def set_last_messages(session: dict, user_msg: str, bot_response: str) -> dict:
